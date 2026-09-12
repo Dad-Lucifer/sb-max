@@ -714,13 +714,33 @@ const updateSession = async (req, res) => {
         // Recalculate full price when people/devices change (e.g., new member added)
         if (newMember) {
             const pricingConfig = await getPricingConfig();
-            totalPrice = calculateSessionPrice(
+
+            // Calculate the ORIGINAL base player/device price (WITHOUT snacks)
+            const originalBasePlayerPrice = calculateSessionPrice(
+                data.duration,
+                data.peopleCount,  // original people count before this update
+                data.devices,      // original devices before this update
+                new Date(data.startTime),
+                pricingConfig
+            );
+
+            // The snack cost embedded in the stored price is the difference between
+            // the total stored price and the original base player price.
+            // This is >0 only when snacks were added; it is 0 for sessions with no snacks.
+            const embeddedSnackCost = Math.max(0, data.price - originalBasePlayerPrice);
+
+            // Recalculate the new player/device price with updated people + devices
+            const newBasePlayerPrice = calculateSessionPrice(
                 data.duration,
                 newPeopleCount,
                 updatedDevices,
                 new Date(data.startTime),
                 pricingConfig
             );
+
+            // Final price = new player price + preserved snack cost + any additional
+            // snack charges from this update (already in extraPrice via the frontend payload)
+            totalPrice = newBasePlayerPrice + embeddedSnackCost + (extraPrice || 0);
         }
 
         // Track actual amounts paid

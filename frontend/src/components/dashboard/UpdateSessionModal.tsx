@@ -327,14 +327,30 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
         try {
             // Re-calculate payload values
             const extraHours = extraMinutes / 60;
-            const charges = corePriceCorrectionDelta + priceDelta;
             const memberCount = newMember.peopleCount;
             const correctionPeople = isEditMode ? (correctedPeopleCount - session.peopleCount) : 0;
+            const isAddingNewMember = memberCount > 0;
+
+            // When adding a new member, the backend recalculates the full player price
+            // and preserves the embedded snack cost from data.price automatically.
+            // We must NOT send priceDelta as extraPrice in that case — only send the
+            // net snack delta (new snacks added minus returned snacks).
+            // For all other updates (time extension, corrections only), send the full
+            // charges delta including priceDelta so the backend can add it to data.price.
+            let extraPriceForPayload: number;
+            if (isAddingNewMember) {
+                // Backend handles player price via full recalc — only forward snack changes.
+                extraPriceForPayload = newSnackCost - returnedSnackPrice;
+            } else {
+                // No new member: backend uses data.price + extraPrice, so include everything.
+                const charges = corePriceCorrectionDelta + priceDelta;
+                extraPriceForPayload = charges + newSnackCost - returnedSnackPrice;
+            }
 
             const payload = {
                 extraTime: extraHours,
-                extraPrice: charges + newSnackCost - returnedSnackPrice,
-                newMember: memberCount > 0 ? newMember : null,
+                extraPrice: extraPriceForPayload,
+                newMember: isAddingNewMember ? newMember : null,
                 addedPeopleCorrection: correctionPeople,
                 snacks: newSnackItems,
                 returnedSnacks,
