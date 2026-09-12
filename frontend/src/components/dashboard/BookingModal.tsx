@@ -79,7 +79,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       try {
         setIsSearching(true);
         const res = await axios.get(
-          "http://localhost:5000/api/customers/search",
+          "https://lavenderblush-chicken-803718.hostingersite.com/api/customers/search",
           { params: { name: form.customerName.trim() } }
         );
         if (!cancel) {
@@ -132,7 +132,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       const endDateTime = new Date(`${form.bookingDate}T${form.bookingEndTime}`);
 
       const res = await axios.get(
-        'http://localhost:5000/api/sessions/availability-for-time',
+        'https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/availability-for-time',
         {
           params: {
             startTime: startDateTime.toISOString(),
@@ -230,7 +230,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       const bookingDateTime = new Date(`${form.bookingDate}T${form.bookingTime}`);
       const endDateTime = new Date(`${form.bookingDate}T${form.bookingEndTime}`);
 
-      await axios.post('http://localhost:5000/api/sessions/booking', {
+      await axios.post('https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/booking', {
         customerName: form.customerName,
         contactNumber: form.contactNumber,
         peopleCount: form.peopleCount,
