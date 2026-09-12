@@ -66,7 +66,7 @@ const TopNavbar = ({ onMenuClick }: TopNavbarProps) => {
   useEffect(() => {
     const checkExpiring = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/sessions/active');
+        const res = await axios.get('https://lavenderblush-chicken-803718.hostingersite.com0/api/sessions/active');
         const sessions: Session[] = res.data;
 
         const now = Date.now();

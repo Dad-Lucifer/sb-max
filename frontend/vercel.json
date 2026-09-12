@@ -2,11 +2,11 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "http://localhost:5000/api/$1"
+            "destination": "https://lavenderblush-chicken-803718.hostingersite.com0/api/$1"
         },
         {
             "source": "/socket.io/(.*)",
-            "destination": "http://localhost:5000/socket.io/$1"
+            "destination": "https://lavenderblush-chicken-803718.hostingersite.com0/socket.io/$1"
         },
         {
             "source": "/(.*)",

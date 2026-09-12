@@ -10,11 +10,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://lavenderblush-chicken-803718.hostingersite.com0',
         changeOrigin: true,
       },
       '/socket.io': {
-        target: 'http://localhost:5000',
+        target: 'https://lavenderblush-chicken-803718.hostingersite.com0',
         ws: true,
       }
     }

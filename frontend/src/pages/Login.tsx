@@ -92,9 +92,9 @@ const Login = () => {
                 <div className="marquee-container">
                     <div className="marquee">
                         <span>SB</span>
-                        <span className="stroke-text">SB</span>
+                        <span className="stroke-text">MAX</span>
                         <span>SB</span>
-                        <span className="stroke-text">SB</span>
+                        <span className="stroke-text">MANAGEMENT</span>
                     </div>
                     <div className="marquee reverse">
                         <span className="stroke-text">GAMING</span>
