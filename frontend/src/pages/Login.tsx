@@ -91,10 +91,10 @@ const Login = () => {
                 {/* Scrolling Marquee Background */}
                 <div className="marquee-container">
                     <div className="marquee">
-                        <span>THUNDER</span>
-                        <span className="stroke-text">THUNDER</span>
-                        <span>THUNDER</span>
-                        <span className="stroke-text">THUNDER</span>
+                        <span>SB</span>
+                        <span className="stroke-text">SB</span>
+                        <span>SB</span>
+                        <span className="stroke-text">SB</span>
                     </div>
                     <div className="marquee reverse">
                         <span className="stroke-text">GAMING</span>
@@ -131,7 +131,7 @@ const Login = () => {
                         transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                     >
                         <div className="mobile-only-header">
-                            <h2>THUNDER</h2>
+                            <h2>SB</h2>
                         </div>
 
                         <div className="auth-header-wrapper">
