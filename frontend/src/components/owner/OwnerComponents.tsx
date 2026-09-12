@@ -2,7 +2,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaArrowUp, FaArrowDown, FaMinus, FaDownload, FaInbox } from 'react-icons/fa';
-import * as XLSX from 'xlsx';
 
 // --- Comparison Badge ---
 interface ComparisonBadgeProps {
@@ -99,7 +98,8 @@ interface DownloadButtonProps {
 }
 
 export const DownloadButton: React.FC<DownloadButtonProps> = ({ data, fileName, label = "Download Report" }) => {
-    const handleDownload = () => {
+    const handleDownload = async () => {
+        const XLSX = await import('xlsx');
         const worksheet = XLSX.utils.json_to_sheet(data);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Report");

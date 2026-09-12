@@ -1,24 +1,32 @@
 export const KPI_STATS = {
     today: [
         { label: 'Total Revenue', value: '₹12,450', change: '+15%' },
+        { label: 'Total Online Revenue', value: '₹8,200', change: '+10%' },
+        { label: 'Total Cash Revenue', value: '₹4,250', change: '+5%' },
         { label: 'Active Sessions', value: '8', change: '+2' },
         { label: 'Avg Session Time', value: '45m', change: '+5m' },
         { label: 'Snacks Sold', value: '24', change: '+12%' }
     ],
     yesterday: [
         { label: 'Total Revenue', value: '₹10,200', change: '-5%' },
+        { label: 'Total Online Revenue', value: '₹6,500', change: '-3%' },
+        { label: 'Total Cash Revenue', value: '₹3,700', change: '-2%' },
         { label: 'Active Sessions', value: '6', change: '-1' },
         { label: 'Avg Session Time', value: '40m', change: '0m' },
         { label: 'Snacks Sold', value: '20', change: '-2%' }
     ],
     lastweek: [
         { label: 'Total Revenue', value: '₹85,000', change: '+10%' },
+        { label: 'Total Online Revenue', value: '₹55,000', change: '+8%' },
+        { label: 'Total Cash Revenue', value: '₹30,000', change: '+12%' },
         { label: 'Active Sessions', value: '50', change: '+5' },
         { label: 'Avg Session Time', value: '42m', change: '+2m' },
         { label: 'Snacks Sold', value: '150', change: '+8%' }
     ],
     thismonth: [
         { label: 'Total Revenue', value: '₹340,000', change: '+12%' },
+        { label: 'Total Online Revenue', value: '₹220,000', change: '+14%' },
+        { label: 'Total Cash Revenue', value: '₹120,000', change: '+10%' },
         { label: 'Active Sessions', value: '200', change: '+20' },
         { label: 'Avg Session Time', value: '44m', change: '+4m' },
         { label: 'Snacks Sold', value: '600', change: '+15%' }

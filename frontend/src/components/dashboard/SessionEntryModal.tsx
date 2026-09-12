@@ -3,15 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaPlaystation,
-    FaDesktop,
-    FaVrCardboard,
     FaRocket,
     FaUser,
     FaClock,
     FaTimes,
     FaCheckCircle
 } from 'react-icons/fa';
-import { GiSteeringWheel, GiCricketBat } from 'react-icons/gi';
 import api from '../../utils/api';
 import './SessionEntry.css';
 import './UpdateSessionModal.css'; // Reuse modal styles
@@ -20,14 +17,10 @@ import { usePricing } from '../../context/PricingContext';
 
 /* ---------------- TYPES ---------------- */
 
-type DeviceKeys = 'ps' | 'pc' | 'vr' | 'wheel' | 'metabat';
+type DeviceKeys = 'ps';
 
 interface DeviceCounts {
     ps: number[];
-    pc: number[];
-    vr: number[];
-    wheel: number[];
-    metabat: number[];
 }
 
 interface FormState {
@@ -89,11 +82,7 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
         gameName: "",
         snacks: '',
         devices: {
-            ps: [],
-            pc: [],
-            vr: [],
-            wheel: [],
-            metabat: []
+            ps: []
         }
     });
 
@@ -102,8 +91,8 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
         limits: Record<DeviceKeys, number>;
         occupied: { [key in DeviceKeys]: number[] };
     }>({
-        limits: { ps: 0, pc: 0, vr: 0, wheel: 0, metabat: 0 },
-        occupied: { ps: [], pc: [], vr: [], wheel: [], metabat: [] }
+        limits: { ps: 0 },
+        occupied: { ps: [] }
     });
 
     const updateField = <K extends keyof FormState>(
@@ -255,12 +244,6 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
     );
     const totalPrice = basePrice + snackCost - coinDiscount;
 
-    const numPcSelected = (form.devices.pc as number[] | undefined)?.length || 0;
-    const numPeople = Number(form.peopleCount) || 1;
-    // For PC sessions: price only valid when headcount matches PC count
-    const pcCountValid = numPcSelected === 0 || numPeople === numPcSelected;
-
-
     const isHappyHour = isHappyHourTime(new Date(), config);
     const isFunNight = !isHappyHour && isFunNightTime(new Date(), config);
     const isNormalHour = !isHappyHour && !isFunNight && isNormalHourTime(new Date(), config);
@@ -301,7 +284,7 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
                     peopleCount: '',
                     gameName: "",
                     snacks: '',
-                    devices: { ps: [], pc: [], vr: [], wheel: [], metabat: [] }
+                    devices: { ps: [] }
                 });
                 setSnackItems([]); // Reset snacks
                 setCoinDiscount(0);
@@ -659,38 +642,6 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                                 occupied={availability.occupied.ps || []}
                                                 onChange={v => updateDevice('ps', v)}
                                             />
-                                            <DeviceDropdown
-                                                icon={<FaDesktop />}
-                                                label="PC"
-                                                limit={availability.limits.pc}
-                                                value={form.devices.pc}
-                                                occupied={availability.occupied.pc || []}
-                                                onChange={v => updateDevice('pc', v)}
-                                            />
-                                            <DeviceDropdown
-                                                icon={<FaVrCardboard />}
-                                                label="VR"
-                                                limit={availability.limits.vr}
-                                                value={form.devices.vr}
-                                                occupied={availability.occupied.vr || []}
-                                                onChange={v => updateDevice('vr', v)}
-                                            />
-                                            <DeviceDropdown
-                                                icon={<GiSteeringWheel />}
-                                                label="Wheel"
-                                                limit={availability.limits.wheel}
-                                                value={form.devices.wheel}
-                                                occupied={availability.occupied.wheel || []}
-                                                onChange={v => updateDevice('wheel', v)}
-                                            />
-                                            <DeviceDropdown
-                                                icon={<GiCricketBat />}
-                                                label="MetaBat"
-                                                limit={availability.limits.metabat}
-                                                value={form.devices.metabat}
-                                                occupied={availability.occupied.metabat || []}
-                                                onChange={v => updateDevice('metabat', v)}
-                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -713,54 +664,32 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
                         <div className="action-bar" style={{ borderRadius: '0 0 24px 24px' }}>
                             {Object.values(form.devices).some(val => val.length > 0) && (
                                 <div className="price-display" style={{ textAlign: "right" }}>
+                                    <span className="price-label">Estimated Total</span>
 
-                                    {!pcCountValid ? (
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            justifyContent: 'flex-end',
-                                            color: '#f59e0b',
-                                            fontSize: '0.85rem',
-                                            fontWeight: 600,
-                                            padding: '6px 10px',
-                                            background: 'rgba(245,158,11,0.08)',
-                                            borderRadius: '8px',
-                                            border: '1px solid rgba(245,158,11,0.25)'
-                                        }}>
-                                            ⚠️ Set People Count to {numPcSelected} to match {numPcSelected} PC{numPcSelected > 1 ? 's' : ''}
+                                    {/* Original price */}
+                                    {coinDiscount > 0 && (
+                                        <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                                            Original: ₹{Math.round(basePrice + snackCost)}
                                         </div>
-                                    ) : (
-                                        <>
-                                            <span className="price-label">Estimated Total</span>
-
-                                            {/* Original price */}
-                                            {coinDiscount > 0 && (
-                                                <div style={{ fontSize: 12, color: "#94a3b8" }}>
-                                                    Original: ₹{Math.round(basePrice + snackCost)}
-                                                </div>
-                                            )}
-
-                                            {/* Thunder coin discount */}
-                                            {coinDiscount > 0 && (
-                                                <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 600 }}>
-                                                    ⚡ Thunder Coins Discount: -₹{coinDiscount}
-                                                </div>
-                                            )}
-
-                                            {/* Final price */}
-                                            <span
-                                                className="price-val"
-                                                style={{
-                                                    color: coinDiscount > 0 ? "#22c55e" : undefined,
-                                                    fontSize: coinDiscount > 0 ? "1.4rem" : undefined
-                                                }}
-                                            >
-                                                ₹{Math.round(totalPrice)}
-                                            </span>
-                                        </>
                                     )}
 
+                                    {/* Thunder coin discount */}
+                                    {coinDiscount > 0 && (
+                                        <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 600 }}>
+                                            ⚡ Thunder Coins Discount: -₹{coinDiscount}
+                                        </div>
+                                    )}
+
+                                    {/* Final price */}
+                                    <span
+                                        className="price-val"
+                                        style={{
+                                            color: coinDiscount > 0 ? "#22c55e" : undefined,
+                                            fontSize: coinDiscount > 0 ? "1.4rem" : undefined
+                                        }}
+                                    >
+                                        ₹{Math.round(totalPrice)}
+                                    </span>
                                 </div>
                             )}
 

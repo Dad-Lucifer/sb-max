@@ -10,8 +10,6 @@ import {
     MdAccessTime,
     MdFlashOn,
     MdShield,
-    MdVideogameAsset,
-    MdComputer,
     MdSettingsInputComponent,
     MdInfo,
     MdTune,
@@ -23,7 +21,7 @@ import './PricingConfig.css';
 
 // URL is now handled by the api utility
 
-type TabType = 'hours' | 'consoles' | 'specialized';
+type TabType = 'hours' | 'consoles';
 
 const PricingConfigPage = () => {
     const { refreshConfig } = usePricing();
@@ -274,7 +272,7 @@ const PricingConfigPage = () => {
                 <div className="settings-group">
                     <div className="settings-group-header">
                         <div className="settings-group-title">
-                            <MdSettingsInputComponent style={{ color: '#3b82f6' }} /> Console & PC Rate Matrix
+                            <MdSettingsInputComponent style={{ color: '#3b82f6' }} /> Console Rate Matrix
                         </div>
                         <div className="price-toggle-group">
                             <button className={`price-toggle-btn ${dayPriceTab === 'monWed' ? 'active' : ''}`} onClick={() => setDayPriceTab('monWed')}>Mon-Wed</button>
@@ -313,42 +311,6 @@ const PricingConfigPage = () => {
                                     <td><input type="number" value={priceSet.normalHour.ps5.extra30mMod} onChange={e => handleChange(prefix, 'normalHour.ps5.extra30mMod', Number(e.target.value))} className="dashboard-input" /></td>
                                 </tr>
 
-                                {/* PC */}
-                                <tr className="price-row-card">
-                                    <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MdComputer style={{ color: '#facc15' }} /> PC (Happy Hour)</div></td>
-                                    <td><input type="number" value={priceSet.happyHour.pc.less30m} onChange={e => handleChange(prefix, 'happyHour.pc.less30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.happyHour.pc.base} onChange={e => handleChange(prefix, 'happyHour.pc.base', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.happyHour.pc.twoPerson || ''} onChange={e => handleChange(prefix, 'happyHour.pc.twoPerson', Number(e.target.value))} className="dashboard-input" placeholder="-" /></td>
-                                    <td><input type="number" value={priceSet.happyHour.pc.multiplePersonBaseMod} onChange={e => handleChange(prefix, 'happyHour.pc.multiplePersonBaseMod', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.happyHour.pc.extra30m} onChange={e => handleChange(prefix, 'happyHour.pc.extra30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                </tr>
-                                <tr className="price-row-card">
-                                    <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MdComputer style={{ color: '#60a5fa' }} /> PC (Normal)</div></td>
-                                    <td><input type="number" value={priceSet.normalHour.pc.less30m} onChange={e => handleChange(prefix, 'normalHour.pc.less30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.normalHour.pc.base} onChange={e => handleChange(prefix, 'normalHour.pc.base', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.normalHour.pc.twoPerson || ''} onChange={e => handleChange(prefix, 'normalHour.pc.twoPerson', Number(e.target.value))} className="dashboard-input" placeholder="-" /></td>
-                                    <td><input type="number" value={priceSet.normalHour.pc.multiplePersonBaseMod} onChange={e => handleChange(prefix, 'normalHour.pc.multiplePersonBaseMod', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.normalHour.pc.extra30m} onChange={e => handleChange(prefix, 'normalHour.pc.extra30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                </tr>
-
-                                {/* Wheel */}
-                                <tr className="price-row-card">
-                                    <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MdSettingsInputComponent style={{ color: '#facc15' }} /> Wheel (Happy Hour)</div></td>
-                                    <td><input type="number" value={priceSet.happyHour.wheel.less30m} onChange={e => handleChange(prefix, 'happyHour.wheel.less30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.happyHour.wheel.base} onChange={e => handleChange(prefix, 'happyHour.wheel.base', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td style={{ textAlign: 'center', color: '#64748b' }}>-</td>
-                                    <td><input type="number" value={priceSet.happyHour.wheel.multiplePersonBaseMod} onChange={e => handleChange(prefix, 'happyHour.wheel.multiplePersonBaseMod', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.happyHour.wheel.extra60m} onChange={e => handleChange(prefix, 'happyHour.wheel.extra60m', Number(e.target.value))} className="dashboard-input" /></td>
-                                </tr>
-                                <tr className="price-row-card">
-                                    <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MdSettingsInputComponent style={{ color: '#60a5fa' }} /> Wheel (Normal)</div></td>
-                                    <td><input type="number" value={priceSet.normalHour.wheel.less30m} onChange={e => handleChange(prefix, 'normalHour.wheel.less30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.normalHour.wheel.base} onChange={e => handleChange(prefix, 'normalHour.wheel.base', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td style={{ textAlign: 'center', color: '#64748b' }}>-</td>
-                                    <td><input type="number" value={priceSet.normalHour.wheel.multiplePersonBaseMod} onChange={e => handleChange(prefix, 'normalHour.wheel.multiplePersonBaseMod', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.normalHour.wheel.extra30m} onChange={e => handleChange(prefix, 'normalHour.wheel.extra30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                </tr>
-
                                 {/* Fun Night (Isolated by Day Slot) */}
                                 <tr className="price-row-card" style={{ borderTop: '2px solid rgba(236, 72, 153, 0.2)' }}>
                                     <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MdShield style={{ color: '#ec4899' }} /> PS5 (Fun Night)</div></td>
@@ -358,22 +320,6 @@ const PricingConfigPage = () => {
                                     <td><input type="number" value={priceSet.funNight.ps5.multiplePersonBaseMod} onChange={e => handleChange(prefix, 'funNight.ps5.multiplePersonBaseMod', Number(e.target.value))} className="dashboard-input" /></td>
                                     <td><input type="number" value={priceSet.funNight.ps5.extra30mMod} onChange={e => handleChange(prefix, 'funNight.ps5.extra30mMod', Number(e.target.value))} className="dashboard-input" /></td>
                                 </tr>
-                                <tr className="price-row-card">
-                                    <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MdShield style={{ color: '#ec4899' }} /> PC (Fun Night)</div></td>
-                                    <td><input type="number" value={priceSet.funNight.pc.less30m} onChange={e => handleChange(prefix, 'funNight.pc.less30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.funNight.pc.base} onChange={e => handleChange(prefix, 'funNight.pc.base', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.funNight.pc.twoPerson || ''} onChange={e => handleChange(prefix, 'funNight.pc.twoPerson', Number(e.target.value))} className="dashboard-input" placeholder="-" /></td>
-                                    <td><input type="number" value={priceSet.funNight.pc.multiplePersonBaseMod} onChange={e => handleChange(prefix, 'funNight.pc.multiplePersonBaseMod', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.funNight.pc.extra30m} onChange={e => handleChange(prefix, 'funNight.pc.extra30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                </tr>
-                                <tr className="price-row-card">
-                                    <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MdShield style={{ color: '#ec4899' }} /> Wheel (Fun Night)</div></td>
-                                    <td><input type="number" value={priceSet.funNight.wheel.less30m} onChange={e => handleChange(prefix, 'funNight.wheel.less30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.funNight.wheel.base} onChange={e => handleChange(prefix, 'funNight.wheel.base', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td style={{ textAlign: 'center', color: '#64748b' }}>-</td>
-                                    <td><input type="number" value={priceSet.funNight.wheel.multiplePersonBaseMod} onChange={e => handleChange(prefix, 'funNight.wheel.multiplePersonBaseMod', Number(e.target.value))} className="dashboard-input" /></td>
-                                    <td><input type="number" value={priceSet.funNight.wheel.extra30m} onChange={e => handleChange(prefix, 'funNight.wheel.extra30m', Number(e.target.value))} className="dashboard-input" /></td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -382,81 +328,7 @@ const PricingConfigPage = () => {
         );
     };
 
-    const renderSpecializedTab = () => (
-        <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
-            <div className="settings-group">
-                <div className="settings-group-header">
-                    <MdVideogameAsset style={{ color: '#a78bfa' }} /> VR Units
-                </div>
-                <div className="settings-grid">
-                    <div className="setting-input-card">
-                        <label className="setting-label">VR: Base Hourly Rate</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.vr.hour} onChange={e => handleChange('vr', 'hour', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                    <div className="setting-input-card">
-                        <label className="setting-label">VR: Initial 15m</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.vr.first15m} onChange={e => handleChange('vr', 'first15m', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                    <div className="setting-input-card">
-                        <label className="setting-label">VR: Half Cycle (30m)</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.vr.first30m} onChange={e => handleChange('vr', 'first30m', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                    <div className="setting-input-card">
-                        <label className="setting-label">VR: Remaining Rate (&gt;30m)</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.vr.remaining} onChange={e => handleChange('vr', 'remaining', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div className="settings-group" style={{ marginTop: '24px' }}>
-                <div className="settings-group-header">
-                    <MdFlashOn style={{ color: '#fbbf24' }} /> Meta-Bat Units
-                </div>
-                <div className="settings-grid">
-                    <div className="setting-input-card">
-                        <label className="setting-label">Meta-Bat: Base Hourly Rate</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.metabat?.hour || 0} onChange={e => handleChange('metabat', 'hour', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                    <div className="setting-input-card">
-                        <label className="setting-label">Meta-Bat: Initial 15m</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.metabat?.first15m || 0} onChange={e => handleChange('metabat', 'first15m', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                    <div className="setting-input-card">
-                        <label className="setting-label">Meta-Bat: Half Cycle (30m)</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.metabat?.first30m || 0} onChange={e => handleChange('metabat', 'first30m', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                    <div className="setting-input-card">
-                        <label className="setting-label">Meta-Bat: Remaining Rate (&gt;30m)</label>
-                        <div className="setting-value-wrap">
-                            <span className="unit-label">₹</span>
-                            <input type="number" value={config.metabat?.remaining || 0} onChange={e => handleChange('metabat', 'remaining', Number(e.target.value))} className="dashboard-input" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </motion.div>
-    );
 
     return (
         <div className="pricing-dashboard-view">
@@ -501,16 +373,12 @@ const PricingConfigPage = () => {
                     <button className={`tab-btn ${activeTab === 'consoles' ? 'active' : ''}`} onClick={() => setActiveTab('consoles')}>
                         <MdSettingsInputComponent className="tab-icon" /> Rate Matrix
                     </button>
-                    <button className={`tab-btn ${activeTab === 'specialized' ? 'active' : ''}`} onClick={() => setActiveTab('specialized')}>
-                        <MdVideogameAsset className="tab-icon" /> Specialized Units
-                    </button>
                 </nav>
 
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                     <main className="pricing-tabs-content">
                         {activeTab === 'hours' && renderHoursTab()}
                         {activeTab === 'consoles' && renderConsolesTab()}
-                        {activeTab === 'specialized' && renderSpecializedTab()}
                     </main>
 
                     <footer className="module-actions-bar">

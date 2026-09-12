@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import api from '../../utils/api';
 import { motion } from "framer-motion";
-import { FaTimes, FaDesktop, FaGamepad, FaClock, FaUserPlus, FaPizzaSlice, FaMinus, FaPlus, FaChevronRight, FaTrash, FaVrCardboard, FaEdit, FaTools, FaBolt } from "react-icons/fa";
-import { GiSteeringWheel, GiCricketBat } from "react-icons/gi";
+import { FaTimes, FaGamepad, FaClock, FaUserPlus, FaPizzaSlice, FaMinus, FaPlus, FaChevronRight, FaTrash, FaEdit, FaTools, FaBolt } from "react-icons/fa";
 import "./UpdateSessionModal.css";
 import SnackSelector from './SnackSelector';
 import DeviceDropdown from './DeviceDropdown';
@@ -15,20 +14,12 @@ import { useAuth } from '../../context/AuthContext';
 // ------------------- Types -------------------
 interface DeviceMap {
     ps: number[];
-    pc: number[];
-    vr: number[];
-    wheel: number[];
-    metabat: number[];
 }
 
 interface Availability {
     limits: Record<string, number>;
     occupied: {
         ps: number[];
-        pc: number[];
-        vr: number[];
-        wheel: number[];
-        metabat: number[];
     };
 }
 
@@ -87,8 +78,8 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
 
     // Feature 2: Add Member & Availability
     const [availability, setAvailability] = useState<Availability>({
-        limits: { ps: 0, pc: 0, vr: 0, wheel: 0, metabat: 0 },
-        occupied: { ps: [], pc: [], vr: [], wheel: [], metabat: [] }
+        limits: { ps: 0 },
+        occupied: { ps: [] }
     });
 
     useEffect(() => {
@@ -138,7 +129,7 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
     const [newMember, setNewMember] = useState({
         name: "",
         peopleCount: 0,
-        devices: { ps: [], pc: [], vr: [], wheel: [], metabat: [] } as DeviceMap
+        devices: { ps: [] } as DeviceMap
     });
 
     // Feature 3: Snacks (Dynamic)
@@ -157,7 +148,7 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
     const mergedDevices: Record<string, number[]> = { ...currentDeviceMap };
 
     // Ensure all keys exist
-    ['ps', 'pc', 'vr', 'wheel', 'metabat'].forEach(k => {
+    ['ps'].forEach(k => {
         if (!mergedDevices[k]) mergedDevices[k] = [];
     });
 
@@ -590,12 +581,8 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
                                     <h3 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-subtle)' }}>
                                         <FaTools style={{ display: 'inline', marginRight: '6px' }} /> Assign Hardware
                                     </h3>
-                                    <div className="devices-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '0.75rem' }}>
+                                    <div className="devices-list">
                                         <DeviceDropdown icon={<FaGamepad />} label="PS5" limit={availability.limits.ps} value={newMember.devices.ps} occupied={availability.occupied.ps || []} onChange={v => updateDevice('ps', v)} />
-                                        <DeviceDropdown icon={<FaDesktop />} label="PC" limit={availability.limits.pc} value={newMember.devices.pc} occupied={availability.occupied.pc || []} onChange={v => updateDevice('pc', v)} />
-                                        <DeviceDropdown icon={<FaVrCardboard />} label="VR" limit={availability.limits.vr} value={newMember.devices.vr} occupied={availability.occupied.vr || []} onChange={v => updateDevice('vr', v)} />
-                                        <DeviceDropdown icon={<GiSteeringWheel />} label="Wheel" limit={availability.limits.wheel} value={newMember.devices.wheel} occupied={availability.occupied.wheel || []} onChange={v => updateDevice('wheel', v)} />
-                                        <DeviceDropdown icon={<GiCricketBat />} label="MetaBat" limit={availability.limits.metabat} value={newMember.devices.metabat} occupied={availability.occupied.metabat || []} onChange={v => updateDevice('metabat', v)} />
                                     </div>
                                 </div>
 

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import * as XLSX from 'xlsx';
 
 /**
  * Custom Hook for handling Session Exports
@@ -27,6 +26,9 @@ export const useSessionExport = () => {
                 setLoading(false);
                 return;
             }
+
+            // Dynamically load XLSX only when exporting
+            const XLSX = await import('xlsx');
 
             // 1. Create a new Workbook
             const wb = XLSX.utils.book_new();

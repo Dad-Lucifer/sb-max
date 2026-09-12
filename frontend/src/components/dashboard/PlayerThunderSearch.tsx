@@ -75,7 +75,7 @@ const PlayerThunderSearchModal = ({ open, onClose }: Props) => {
         try {
             /* STEP 1 — verify player */
             const playerRes = await axios.get(
-                "https://lavenderblush-chicken-803718.hostingersite.com/api/battles/thunder-player",
+                "http://localhost:5000/api/battles/thunder-player",
                 { params: { name, phone } }
             );
 
@@ -83,7 +83,7 @@ const PlayerThunderSearchModal = ({ open, onClose }: Props) => {
 
             /* STEP 2 — fetch activity ONLY if player valid */
             const activityRes = await axios.get(
-                "https://lavenderblush-chicken-803718.hostingersite.com/api/battles/player-activity",
+                "http://localhost:5000/api/battles/player-activity",
                 { params: { phone } }
             );
 
@@ -117,7 +117,7 @@ const PlayerThunderSearchModal = ({ open, onClose }: Props) => {
                 setIsSearching(true);
 
                 const res = await axios.get(
-                    "https://lavenderblush-chicken-803718.hostingersite.com/api/customers/search",
+                    "http://localhost:5000/api/customers/search",
                     { params: { name: name.trim() } }
                 );
 

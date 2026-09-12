@@ -3,7 +3,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import {
-    FaCalendarAlt, FaDownload, FaChartLine, FaRobot, FaUserCog
+    FaCalendarAlt, FaDownload, FaChartLine, FaRobot, FaUserCog, FaCreditCard, FaMoneyBillWave
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
@@ -28,24 +28,27 @@ interface KPIStat {
     trend: number;
 }
 
+const LiveClock: React.FC = React.memo(() => {
+    const [time, setTime] = useState(() => new Date().toLocaleTimeString());
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTime(new Date().toLocaleTimeString());
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return <div className="live-clock">{time}</div>;
+});
+
 const OwnerDashboard: React.FC = () => {
     const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
     const [timeFilter, setTimeFilter] = useState('Today');
-    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
     const [chartMode, setChartMode] = useState<'hour' | 'day'>('hour');
     const [kpiStats, setKpiStats] = useState<KPIStat[]>([]);
     const [revenueTrends, setRevenueTrends] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // Live clock
-    useEffect(() => {
-        const interval = setInterval(
-            () => setCurrentTime(new Date().toLocaleTimeString()),
-            1000
-        );
-        return () => clearInterval(interval);
-    }, []);
 
     // Fetch dashboard data
     useEffect(() => {
@@ -91,8 +94,11 @@ const OwnerDashboard: React.FC = () => {
 
     // Icon helper
     const getIconForLabel = (label: string) => {
-        if (label.includes('Revenue')) return FaChartLine;
-        if (label.includes('Time')) return FaCalendarAlt;
+        const lower = label.toLowerCase();
+        if (lower.includes('online')) return FaCreditCard;
+        if (lower.includes('cash')) return FaMoneyBillWave;
+        if (lower.includes('revenue')) return FaChartLine;
+        if (lower.includes('time')) return FaCalendarAlt;
         return FaRobot;
     };
 
@@ -115,7 +121,7 @@ const OwnerDashboard: React.FC = () => {
                     </div>
 
                     <div className="header-center">
-                        <div className="live-clock">{currentTime}</div>
+                        <LiveClock />
                     </div>
 
                     <div className="header-actions">

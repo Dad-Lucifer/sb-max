@@ -57,7 +57,7 @@ const UpcomingBookings = () => {
 
   const fetchBookings = async () => {
     try {
-      const res = await axios.get('https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/upcoming');
+      const res = await axios.get('http://localhost:5000/api/sessions/upcoming');
       // Sort bookings chronologically
       const sorted = res.data.sort((a: Booking, b: Booking) => new Date(a.time).getTime() - new Date(b.time).getTime());
       setBookings(sorted);
@@ -80,7 +80,7 @@ const UpcomingBookings = () => {
     setStartingIds(prev => new Set(prev).add(booking.id));
 
     try {
-      await axios.post(`https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/start-booking/${booking.id}`);
+      await axios.post(`http://localhost:5000/api/sessions/start-booking/${booking.id}`);
       showToast(`${booking.name}'s session has started.`, 'success');
       fetchBookings(); // Refresh the active sessions board somehow? The Dashboard usually polls or gets sockets.
     } catch (error: any) {
@@ -99,7 +99,7 @@ const UpcomingBookings = () => {
     if (!deleteData) return;
 
     try {
-      await axios.delete(`https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/booking/${deleteData.id}`, {
+      await axios.delete(`http://localhost:5000/api/sessions/booking/${deleteData.id}`, {
         data: {
           deletedBy: user?.role === 'owner' ? 'Owner' : 'Employee',
           deletedByName: user?.username || 'Unknown'

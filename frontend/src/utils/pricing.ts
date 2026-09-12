@@ -171,8 +171,8 @@ export const calculateSessionPrice = (
     const nhConf = dayPrices.normalHour;
     const fnConf = dayPrices.funNight;
 
-    const getPriceForSpecs = (conf: { hour: number; first15m: number; first30m: number; remaining: number }, pCount: number) => {
-        if (pCount === 0) return 0;
+    const getPriceForSpecs = (conf: { hour: number; first15m: number; first30m: number; remaining: number } | undefined, pCount: number) => {
+        if (!conf || pCount === 0) return 0;
         let rate = 0;
         const fullHours = Math.floor(durationMinutes / 60);
         rate += fullHours * conf.hour;
@@ -189,8 +189,8 @@ export const calculateSessionPrice = (
         return rate * pCount;
     };
 
-    grandTotal += numVR * getPriceForSpecs(vrConf, 1);
-    grandTotal += numMetaBat * getPriceForSpecs(metabatConf || vrConf, 1);
+    if (vrConf && numVR > 0) grandTotal += numVR * getPriceForSpecs(vrConf, 1);
+    if ((metabatConf || vrConf) && numMetaBat > 0) grandTotal += numMetaBat * getPriceForSpecs(metabatConf || vrConf, 1);
 
     const isHappy = isHappyHourTime(startTime, config);
     const isNormal = isNormalHourTime(startTime, config);
@@ -212,7 +212,7 @@ export const calculateSessionPrice = (
             }
         });
 
-        if (numPC > 0 && totalPeopleOnPC > 0) {
+        if (hhConf.pc && numPC > 0 && totalPeopleOnPC > 0) {
             const p = totalPeopleOnPC;
             const baseCost = p === 1 ? hhConf.pc.base : (p === 2 && hhConf.pc.twoPerson ? hhConf.pc.twoPerson : (hhConf.pc.multiplePersonBaseMod || hhConf.pc.base) * p);
             if (durationMinutes <= 30) {
@@ -226,7 +226,7 @@ export const calculateSessionPrice = (
             }
         }
 
-        if (numWheel > 0) {
+        if (hhConf.wheel && numWheel > 0) {
             let wCost = 0;
             if (durationMinutes <= 30) {
                 wCost = hhConf.wheel.less30m;
@@ -244,7 +244,7 @@ export const calculateSessionPrice = (
 
     // 2️⃣ NORMAL HOUR
     if (isNormal) {
-        if (numWheel > 0) {
+        if (nhConf.wheel && numWheel > 0) {
             let wCost = 0;
             if (durationMinutes <= 30) wCost = nhConf.wheel.less30m;
             else {
@@ -255,7 +255,7 @@ export const calculateSessionPrice = (
             grandTotal += wCost * numWheel;
         }
 
-        if (numPC > 0 && totalPeopleOnPC > 0) {
+        if (nhConf.pc && numPC > 0 && totalPeopleOnPC > 0) {
             const p = totalPeopleOnPC;
             const baseCost = p === 1 ? nhConf.pc.base : (p === 2 && nhConf.pc.twoPerson ? nhConf.pc.twoPerson : (nhConf.pc.multiplePersonBaseMod || nhConf.pc.base) * p);
             if (durationMinutes <= 30) {
@@ -292,7 +292,7 @@ export const calculateSessionPrice = (
 
     // 3️⃣ FUN NIGHT
     if (isFun) {
-        if (numWheel > 0) {
+        if (fnConf.wheel && numWheel > 0) {
             let wCost = 0;
             if (durationMinutes <= 30) wCost = fnConf.wheel.less30m;
             else {
@@ -303,7 +303,7 @@ export const calculateSessionPrice = (
             grandTotal += wCost * numWheel;
         }
 
-        if (numPC > 0 && totalPeopleOnPC > 0) {
+        if (fnConf.pc && numPC > 0 && totalPeopleOnPC > 0) {
             const p = totalPeopleOnPC;
             const baseCost = p === 1 ? fnConf.pc.base : (p === 2 && fnConf.pc.twoPerson ? fnConf.pc.twoPerson : (fnConf.pc.multiplePersonBaseMod || fnConf.pc.base) * p);
             if (durationMinutes <= 30) {

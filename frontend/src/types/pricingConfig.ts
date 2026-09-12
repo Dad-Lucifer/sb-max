@@ -26,8 +26,8 @@ export interface DevicePricesWheel {
 
 export interface PriceMatrix {
     ps5: DevicePricesPS5;
-    pc: DevicePricesPC;
-    wheel: DevicePricesWheel;
+    pc?: DevicePricesPC;
+    wheel?: DevicePricesWheel;
 }
 
 export interface DaySlotPrices {
@@ -49,8 +49,8 @@ export interface PricingConfig {
     };
     funNight: { startHour: number; startMinute: number; endHour: number; endMinute: number; };
 
-    vr: { hour: number; first15m: number; first30m: number; remaining: number; };
-    metabat: { hour: number; first15m: number; first30m: number; remaining: number; };
+    vr?: { hour: number; first15m: number; first30m: number; remaining: number; };
+    metabat?: { hour: number; first15m: number; first30m: number; remaining: number; };
 
     // New 3-zone pricing
     monWedPrices: DaySlotPrices;
@@ -73,58 +73,37 @@ export const defaultPricingConfig: PricingConfig = {
     },
     funNight: { startHour: 20, startMinute: 45, endHour: 6, endMinute: 0 },
 
-    vr: { hour: 180, first15m: 50, first30m: 100, remaining: 180 },
-    metabat: { hour: 200, first15m: 60, first30m: 120, remaining: 200 },
-
     monWedPrices: {
         happyHour: {
-            ps5: { less30m: 40, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 },
-            pc: { less30m: 40, base: 50, twoPerson: 90, extra30m: 30, multiplePersonBaseMod: 50 },
-            wheel: { less30m: 80, base: 120, extra60m: 60, extra30m: 60, multiplePersonBaseMod: 120 }
+            ps5: { less30m: 40, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 }
         },
         normalHour: {
-            ps5: { less30m: 60, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 },
-            pc: { less30m: 30, base: 60, twoPerson: 100, extra30m: 40, hourRateIfMoreThan3h: 50, multiplePersonBaseMod: 60 },
-            wheel: { less30m: 90, base: 150, extra30m: 75, multiplePersonBaseMod: 150 }
+            ps5: { less30m: 60, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 }
         },
         funNight: {
-            ps5: { less30m: 50, onePerson: 100, twoPerson: 150, multiplePersonBaseMod: 50, extra30mMod: 50 },
-            pc: { less30m: 25, base: 50, twoPerson: 90, extra30m: 30, hourRateIfMoreThan3h: 50, multiplePersonBaseMod: 50 },
-            wheel: { less30m: 90, base: 150, extra30m: 75, multiplePersonBaseMod: 150 }
+            ps5: { less30m: 50, onePerson: 100, twoPerson: 150, multiplePersonBaseMod: 50, extra30mMod: 50 }
         }
     },
     thursdayPrices: {
         happyHour: {
-            ps5: { less30m: 40, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 },
-            pc: { less30m: 40, base: 50, twoPerson: 90, extra30m: 30, multiplePersonBaseMod: 50 },
-            wheel: { less30m: 80, base: 120, extra60m: 60, extra30m: 60, multiplePersonBaseMod: 120 }
+            ps5: { less30m: 40, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 }
         },
         normalHour: {
-            ps5: { less30m: 60, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 },
-            pc: { less30m: 30, base: 60, twoPerson: 100, extra30m: 40, hourRateIfMoreThan3h: 50, multiplePersonBaseMod: 60 },
-            wheel: { less30m: 90, base: 150, extra30m: 75, multiplePersonBaseMod: 150 }
+            ps5: { less30m: 60, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 }
         },
         funNight: {
-            ps5: { less30m: 50, onePerson: 100, twoPerson: 150, multiplePersonBaseMod: 50, extra30mMod: 50 },
-            pc: { less30m: 25, base: 50, twoPerson: 90, extra30m: 30, hourRateIfMoreThan3h: 50, multiplePersonBaseMod: 50 },
-            wheel: { less30m: 90, base: 150, extra30m: 75, multiplePersonBaseMod: 150 }
+            ps5: { less30m: 50, onePerson: 100, twoPerson: 150, multiplePersonBaseMod: 50, extra30mMod: 50 }
         }
     },
     friSunPrices: {
         happyHour: {
-            ps5: { less30m: 40, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 },
-            pc: { less30m: 40, base: 50, twoPerson: 90, extra30m: 30, multiplePersonBaseMod: 50 },
-            wheel: { less30m: 80, base: 120, extra60m: 60, extra30m: 60, multiplePersonBaseMod: 120 }
+            ps5: { less30m: 40, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 }
         },
         normalHour: {
-            ps5: { less30m: 60, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 },
-            pc: { less30m: 30, base: 60, twoPerson: 100, extra30m: 40, hourRateIfMoreThan3h: 50, multiplePersonBaseMod: 60 },
-            wheel: { less30m: 90, base: 150, extra30m: 75, multiplePersonBaseMod: 150 }
+            ps5: { less30m: 60, onePerson: 120, twoPerson: 170, multiplePersonBaseMod: 50, extra30mMod: 60 }
         },
         funNight: {
-            ps5: { less30m: 50, onePerson: 100, twoPerson: 150, multiplePersonBaseMod: 50, extra30mMod: 50 },
-            pc: { less30m: 25, base: 50, twoPerson: 90, extra30m: 30, hourRateIfMoreThan3h: 50, multiplePersonBaseMod: 50 },
-            wheel: { less30m: 90, base: 150, extra30m: 75, multiplePersonBaseMod: 150 }
+            ps5: { less30m: 50, onePerson: 100, twoPerson: 150, multiplePersonBaseMod: 50, extra30mMod: 50 }
         }
     },
 

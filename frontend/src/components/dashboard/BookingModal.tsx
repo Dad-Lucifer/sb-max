@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaPlaystation,
-  FaDesktop,
-  FaVrCardboard,
   FaTimes,
   FaCalendarAlt,
   FaUser,
@@ -14,7 +12,6 @@ import {
   FaCheckCircle,
   FaPhone
 } from 'react-icons/fa';
-import { GiSteeringWheel, GiCricketBat } from 'react-icons/gi';
 import axios from 'axios';
 import './BookingModal.css';
 import { useToast } from '../../context/ToastContext';
@@ -30,7 +27,7 @@ interface Props {
 
 // Device Dropdown moved to separate file
 
-type DeviceType = 'ps' | 'pc' | 'vr' | 'wheel' | 'metabat';
+type DeviceType = 'ps';
 
 interface DeviceInfo {
   key: DeviceType;
@@ -39,11 +36,7 @@ interface DeviceInfo {
 }
 
 const DEVICES: DeviceInfo[] = [
-  { key: 'ps', label: 'PlayStation 5', icon: <FaPlaystation /> },
-  { key: 'pc', label: 'PC Gaming', icon: <FaDesktop /> },
-  { key: 'vr', label: 'VR Station', icon: <FaVrCardboard /> },
-  { key: 'wheel', label: 'Racing Wheel', icon: <GiSteeringWheel /> },
-  { key: 'metabat', label: 'Meta Bat', icon: <GiCricketBat /> }
+  { key: 'ps', label: 'PlayStation 5', icon: <FaPlaystation /> }
 ];
 
 const BookingModal = ({ onClose, onSuccess }: Props) => {
@@ -57,11 +50,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
     bookingTime: '',
     bookingEndTime: '',
     devices: {
-      ps: [],
-      pc: [],
-      vr: [],
-      wheel: [],
-      metabat: []
+      ps: []
     } as Record<string, number[]>
   });
 
@@ -90,7 +79,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       try {
         setIsSearching(true);
         const res = await axios.get(
-          "https://lavenderblush-chicken-803718.hostingersite.com/api/customers/search",
+          "http://localhost:5000/api/customers/search",
           { params: { name: form.customerName.trim() } }
         );
         if (!cancel) {
@@ -125,8 +114,8 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
     limits: Record<string, number>;
     occupied: { [key: string]: number[] };
   }>({
-    limits: { ps: 0, pc: 0, vr: 0, wheel: 0, metabat: 0 },
-    occupied: { ps: [], pc: [], vr: [], wheel: [], metabat: [] }
+    limits: { ps: 0 },
+    occupied: { ps: [] }
   });
 
   const [loadingAvailability, setLoadingAvailability] = useState(false);
@@ -143,7 +132,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       const endDateTime = new Date(`${form.bookingDate}T${form.bookingEndTime}`);
 
       const res = await axios.get(
-        'https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/availability-for-time',
+        'http://localhost:5000/api/sessions/availability-for-time',
         {
           params: {
             startTime: startDateTime.toISOString(),
@@ -156,8 +145,8 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       console.error("Failed to fetch time-based availability", e);
       // Fallback
       setTimeBasedAvailability({
-        limits: { ps: 6, pc: 5, vr: 1, wheel: 1, metabat: 1 },
-        occupied: { ps: [], pc: [], vr: [], wheel: [], metabat: [] }
+        limits: { ps: 6 },
+        occupied: { ps: [] }
       });
     } finally {
       setLoadingAvailability(false);
@@ -214,7 +203,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       case 2:
         return form.bookingDate && form.bookingTime && form.bookingEndTime;
       case 3:
-        return getTotalDevices() > 0 && getTotalDevices() <= form.peopleCount && pcCountValid;
+        return getTotalDevices() > 0 && getTotalDevices() <= form.peopleCount;
       default:
         return false;
     }
@@ -241,7 +230,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       const bookingDateTime = new Date(`${form.bookingDate}T${form.bookingTime}`);
       const endDateTime = new Date(`${form.bookingDate}T${form.bookingEndTime}`);
 
-      await axios.post('https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/booking', {
+      await axios.post('http://localhost:5000/api/sessions/booking', {
         customerName: form.customerName,
         contactNumber: form.contactNumber,
         peopleCount: form.peopleCount,
@@ -281,9 +270,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
     );
   };
 
-  // PC count validation: price only valid when people count matches PC count
-  const numPcSelected = (form.devices.pc as number[])?.length || 0;
-  const pcCountValid = numPcSelected === 0 || form.peopleCount === numPcSelected;
+
 
 
   const getFormattedSummary = () => {
@@ -642,42 +629,6 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
                       occupied={timeBasedAvailability.occupied.ps || []}
                       onChange={v => updateDevice('ps', v)}
                     />
-
-                    <DeviceDropdown
-                      icon={<FaDesktop />}
-                      label="PC"
-                      limit={timeBasedAvailability.limits.pc}
-                      value={form.devices.pc}
-                      occupied={timeBasedAvailability.occupied.pc || []}
-                      onChange={v => updateDevice('pc', v)}
-                    />
-
-                    <DeviceDropdown
-                      icon={<FaVrCardboard />}
-                      label="VR"
-                      limit={timeBasedAvailability.limits.vr}
-                      value={form.devices.vr}
-                      occupied={timeBasedAvailability.occupied.vr || []}
-                      onChange={v => updateDevice('vr', v)}
-                    />
-
-                    <DeviceDropdown
-                      icon={<GiSteeringWheel />}
-                      label="Wheel"
-                      limit={timeBasedAvailability.limits.wheel}
-                      value={form.devices.wheel}
-                      occupied={timeBasedAvailability.occupied.wheel || []}
-                      onChange={v => updateDevice('wheel', v)}
-                    />
-
-                    <DeviceDropdown
-                      icon={<GiCricketBat />}
-                      label="MetaBat"
-                      limit={timeBasedAvailability.limits.metabat}
-                      value={form.devices.metabat}
-                      occupied={timeBasedAvailability.occupied.metabat || []}
-                      onChange={v => updateDevice('metabat', v)}
-                    />
                   </div>
                 )}
 
@@ -709,22 +660,9 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
                     </div>
                     <div className="summary-item" style={{ borderTop: '1px dashed rgba(255,255,255,0.1)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
                       <span className="summary-label">Estimated Cost:</span>
-                      {!pcCountValid ? (
-                        <span style={{
-                          color: '#f59e0b',
-                          fontSize: '0.8rem',
-                          fontWeight: 600,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}>
-                          ⚠️ Set People to {numPcSelected} to match {numPcSelected} PC{numPcSelected > 1 ? 's' : ''}
-                        </span>
-                      ) : (
-                        <span className="summary-value" style={{ color: '#ec4899', fontWeight: 'bold' }}>
-                          ₹{getEstimatedPrice().toFixed(0)}
-                        </span>
-                      )}
+                      <span className="summary-value" style={{ color: '#ec4899', fontWeight: 'bold' }}>
+                        ₹{getEstimatedPrice().toFixed(0)}
+                      </span>
                     </div>
                   </div>
                 )}

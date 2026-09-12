@@ -86,6 +86,8 @@ const getOwnerDashboardStats = async (req, res) => {
       .get();
 
     let totalRevenue = 0;
+    let totalOnlineRevenue = 0;
+    let totalCashRevenue = 0;
     let totalDuration = 0;
     let completedSessions = 0;
 
@@ -96,6 +98,8 @@ const getOwnerDashboardStats = async (req, res) => {
       if (!createdAt || createdAt < startDate) return;
 
       totalRevenue += Number(s.price || 0);
+      totalOnlineRevenue += Number(s.online || 0);
+      totalCashRevenue += Number(s.cash || 0);
       totalDuration += Number(s.duration || 0);
       if (s.status === 'completed') completedSessions++;
     });
@@ -108,6 +112,8 @@ const getOwnerDashboardStats = async (req, res) => {
     res.json({
       kpiStats: [
         { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, trend: 0 },
+        { label: 'Total Online Revenue', value: `₹${totalOnlineRevenue.toLocaleString()}`, trend: 0 },
+        { label: 'Total Cash Revenue', value: `₹${totalCashRevenue.toLocaleString()}`, trend: 0 },
         { label: 'Completed Sessions', value: completedSessions, trend: 0 },
         { label: 'Avg Session Time', value: `${avgSessionTime}m`, trend: 0 },
         { label: 'Snacks Sold', value: 0, trend: 0 }
