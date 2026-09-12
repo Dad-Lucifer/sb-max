@@ -1,0 +1,388 @@
+/* SessionEntry.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.session-card-container {
+
+    background: #121214;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Subtle border */
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    font-family: 'Inter', sans-serif;
+    color: #f4f4f5;
+    transition: all 0.3s cubic-bezier(0.25, 0, 0, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.session-card-container:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Header */
+.session-header {
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.modal-containers {
+    margin-top: 60px;
+    background: var(--modal-bg);
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--glass-border);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.01em;
+}
+
+.header-icon {
+    color: #3b82f6;
+    /* Highlight color */
+    background: rgba(59, 130, 246, 0.1);
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.toggle-icon {
+    color: #71717a;
+    transition: transform 0.3s ease;
+}
+
+.session-header:hover .toggle-icon {
+    color: #fff;
+}
+
+/* Body */
+.session-body {
+    padding: 1.5rem;
+    background: #09090b;
+    /* Slightly darker inner bg */
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Input Grid */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #a1a1aa;
+}
+
+.field-input {
+    background: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    background: #27272a;
+}
+
+.field-input::placeholder {
+    color: #52525b;
+}
+
+/* Device Allocator Widget */
+.devices-section {
+    margin-bottom: 2rem;
+}
+
+.section-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #71717a;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+}
+
+.devices-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+}
+
+.device-card-item {
+    background: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* slightly higher contrast */
+    border-radius: 14px;
+    /* slightly rounder */
+    padding: 1rem;
+    /* increased padding */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    /* increased gap */
+    cursor: default;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    min-height: 140px;
+    /* increased height */
+}
+
+.device-card-item:hover {
+    background: #27272a;
+}
+
+.device-card-item.active {
+    border-color: rgba(59, 130, 246, 0.5);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+/* Device status styles - kept minimal as per request */
+.device-card-item.sold-out {
+    /* No opacity change, keep full visibility */
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.device-card-item.sold-out .device-stock {
+    color: #ef4444;
+    /* Just red text for the label */
+    font-weight: 700;
+}
+
+.device-icon-wrapper {
+    font-size: 1.8rem;
+    /* slightly larger icon */
+    color: #a1a1aa;
+    /* brighter unselected icon */
+    transition: color 0.2s;
+    margin-top: 4px;
+}
+
+.device-card-item.active .device-icon-wrapper {
+    color: #3b82f6;
+}
+
+.device-info {
+    text-align: center;
+}
+
+.device-name {
+    font-size: 0.95rem;
+    /* increased font size */
+    color: #fff;
+    /* brighter white text */
+    font-weight: 600;
+    /* bolder */
+    display: block;
+}
+
+.device-stock {
+    font-size: 0.75rem;
+    /* increased */
+    color: #a1a1aa;
+    /* brighter */
+    font-weight: 500;
+}
+
+/* Dropdown Control */
+.dropdown-control {
+    width: 100%;
+    margin-top: auto;
+}
+
+.mini-select {
+    width: 100%;
+    background: #101012;
+    color: #e4e4e7;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 0.85rem;
+    text-align: center;
+    text-align-last: center;
+    /* For Firefox/Chrome centering */
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.mini-select:hover {
+    background: #18181b;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.mini-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.device-card-item.active .mini-select {
+    background: #1e3a8a;
+    /* Dark Blue bg for active */
+    border-color: #3b82f6;
+    color: #fff;
+    font-weight: 600;
+}
+
+.mini-select:disabled {
+    cursor: not-allowed;
+    background: #18181b;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #a1a1aa;
+    opacity: 1;
+}
+
+/* Device Chips */
+.device-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    /* slightly more gap */
+    justify-content: center;
+    width: 100%;
+    margin-top: auto;
+}
+
+.device-chip {
+    width: 28px;
+    /* increased chip size */
+    height: 28px;
+    /* increased chip size */
+    border-radius: 8px;
+    /* slightly rounder */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* brighter border */
+    background: rgba(255, 255, 255, 0.03);
+    /* slight background */
+    color: #d4d4d8;
+    /* brighter text */
+    font-size: 0.8rem;
+    /* larger font */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.device-chip:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.device-chip.selected {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.device-chip.occupied {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Footer Actions */
+.action-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.price-display {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-label {
+    font-size: 0.75rem;
+    color: #a1a1aa;
+}
+
+.price-val {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #10b981;
+    /* Success Green */
+    letter-spacing: -0.02em;
+}
+
+.start-session-btn {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 0 1.5rem;
+    height: 48px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.start-session-btn:hover {
+    background: #f4f4f5;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.15);
+}
+
+.start-session-btn:active {
+    transform: scale(0.96);
+}
+
+.start-session-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

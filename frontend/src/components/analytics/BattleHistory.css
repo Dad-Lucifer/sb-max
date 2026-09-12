@@ -1,0 +1,301 @@
+/* =============================================
+   Battle History — Cyber-Arena Match Logs
+   ============================================= */
+
+.bh-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+}
+
+.bh-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.bh-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.bh-search-box svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--an-muted, #94a3b8);
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+.bh-search-input {
+    width: 100%;
+    padding: 8px 12px 8px 34px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #f8fafc;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bh-search-input:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+
+.bh-search-input::placeholder {
+    color: #64748b;
+}
+
+.bh-count-badge {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    white-space: nowrap;
+}
+
+.bh-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.bh-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.bh-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.bh-card {
+    background: rgba(18, 18, 22, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.bh-card:hover {
+    background: rgba(26, 26, 32, 0.85);
+    border-color: rgba(220, 38, 38, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(220, 38, 38, 0.1);
+}
+
+.bh-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.bh-tags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bh-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.bh-tag-accent {
+    background: rgba(220, 38, 38, 0.15);
+    color: #f87171;
+    border-color: rgba(220, 38, 38, 0.25);
+}
+
+.bh-time {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+.bh-matchup {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+}
+
+.bh-player {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bh-player.player-right {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.bh-player-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bh-player.player-right .bh-player-header {
+    flex-direction: row-reverse;
+}
+
+.bh-crown-icon {
+    color: #fbbf24;
+    font-size: 0.85rem;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.5));
+}
+
+.bh-player-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bh-player.is-winner .bh-player-name {
+    color: #fbbf24;
+}
+
+.bh-player-phone {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.bh-player-score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.bh-player.player-right .bh-player-score-row {
+    flex-direction: row-reverse;
+}
+
+.bh-score {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #94a3b8;
+    line-height: 1;
+}
+
+.bh-player.is-winner .bh-score {
+    color: #10b981;
+    text-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+}
+
+.bh-vs-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.bh-vs-pill {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #f87171;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    padding: 3px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.05em;
+}
+
+.bh-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.75rem;
+}
+
+.bh-winner-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: #10b981;
+}
+
+.bh-winner-info.is-tie {
+    color: #fbbf24;
+}
+
+.bh-coin-reward {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fbbf24;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.bh-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: #64748b;
+    gap: 12px;
+    text-align: center;
+}
+
+.bh-empty svg {
+    font-size: 3rem;
+    opacity: 0.25;
+    color: #ef4444;
+}
+
+.bh-empty-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.bh-empty-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+    max-width: 280px;
+}

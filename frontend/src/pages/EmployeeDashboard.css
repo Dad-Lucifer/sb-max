@@ -1,0 +1,325 @@
+/* ==========================================================================
+   EmployeeDashboard.css - Color System (60-30-10 Ratio)
+   Dominant 60%: Void Obsidian & Deep Smoked Glass (#000000, #08080c, #0e0e14)
+   Secondary 30%: Crimson & Scarlet Structure (#dc2626, #ef4444, #991b1b)
+   Accent 10%: Radiant Thunder Gold (#fbbf24, #f59e0b)
+   Note: Pure color change. Preserves exact original layout, sizing, and structure.
+   ========================================================================== */
+
+/* ── Theme Tokens (Scoped to Employee Dashboard) ── */
+.employee-dashboard-layout {
+    /* 60% Black Palette */
+    --theme-bg-base: #000000;
+    --theme-bg-gradient-start: #180507;
+    --theme-bg-gradient-end: #08080c;
+    --theme-card-bg: rgba(14, 14, 18, 0.78);
+    --theme-text-main: #f8fafc;
+    --theme-text-muted: #94a3b8;
+
+    /* 30% Red Secondary Structure */
+    --theme-primary: #dc2626;
+    --theme-primary-glow: rgba(220, 38, 38, 0.45);
+    --theme-card-border: rgba(220, 38, 38, 0.22);
+    --theme-card-hover-border: rgba(239, 68, 68, 0.55);
+
+    /* 10% Golden Accent */
+    --theme-accent-gold: #fbbf24;
+    --theme-accent-gold-glow: rgba(251, 191, 36, 0.35);
+
+    /* Glass Effect */
+    --glass-surface: rgba(14, 14, 18, 0.75);
+    --glass-border: 1px solid rgba(220, 38, 38, 0.2);
+    --glass-highlight: rgba(255, 255, 255, 0.04);
+
+    /* Typography */
+    --font-heading: 'Outfit', 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+/* ── 1. Background Canvas (60% Deep Obsidian with subtle Crimson Ambient) ── */
+.employee-dashboard-layout.layout-container,
+.employee-dashboard-layout .layout-container {
+    background: radial-gradient(circle at 10% 0%, rgba(185, 28, 28, 0.2) 0%, #09090d 45%, #000000 100%);
+    background-attachment: fixed;
+    color: var(--theme-text-main);
+}
+
+.employee-dashboard-layout .main-content {
+    background: transparent !important;
+}
+
+/* ── 2. Dashboard Content Layout (Preserved Original) ── */
+.dashboard-content-redesign {
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    max-width: 1440px;
+    margin: 0 auto;
+    animation: fadeInPage 0.6s ease-out;
+}
+
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.employee-dashboard-layout h1, 
+.employee-dashboard-layout h2, 
+.employee-dashboard-layout h3 {
+    font-family: var(--font-heading);
+    color: #ffffff;
+}
+
+/* ── 3. QuickActions Color Mapping ── */
+.employee-dashboard-layout .action-card {
+    background: var(--theme-card-bg);
+    border-color: var(--theme-card-border);
+}
+
+.employee-dashboard-layout .action-card:hover {
+    border-color: var(--theme-card-hover-border);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(220, 38, 38, 0.2);
+}
+
+/* Session Action Card */
+.employee-dashboard-layout .action-card.session {
+    background: linear-gradient(135deg, rgba(185, 28, 28, 0.16) 0%, rgba(14, 14, 18, 0.8) 100%);
+}
+
+.employee-dashboard-layout .action-card.session:hover .action-icon-wrapper {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.45);
+}
+
+/* Battle Action Card */
+.employee-dashboard-layout .action-card.battle {
+    background: linear-gradient(135deg, rgba(185, 28, 28, 0.18) 0%, rgba(14, 14, 18, 0.8) 100%);
+    border-color: rgba(220, 38, 38, 0.25);
+}
+
+.employee-dashboard-layout .action-card.battle:hover {
+    border-color: #ef4444;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(239, 68, 68, 0.25);
+}
+
+.employee-dashboard-layout .action-card.battle:hover .action-icon-wrapper {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.45);
+}
+
+/* Snacks Action Card */
+.employee-dashboard-layout .action-card.snacks {
+    background: linear-gradient(135deg, rgba(120, 30, 30, 0.14) 0%, rgba(14, 14, 18, 0.8) 100%);
+    border-color: rgba(220, 38, 38, 0.2);
+}
+
+.employee-dashboard-layout .action-card.snacks:hover {
+    border-color: var(--theme-accent-gold);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(251, 191, 36, 0.25);
+}
+
+.employee-dashboard-layout .action-card.snacks:hover .action-icon-wrapper {
+    background: linear-gradient(135deg, #d97706, #fbbf24);
+    color: #000000;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+.employee-dashboard-layout .action-card:hover .action-arrow {
+    color: var(--theme-accent-gold);
+}
+
+/* ── 4. Active Sessions Color Mapping ── */
+.employee-dashboard-layout .section-title-lg {
+    text-shadow: 0 0 20px rgba(220, 38, 38, 0.35);
+}
+
+/* 10% Gold Status Highlights */
+.employee-dashboard-layout .player-count {
+    background: rgba(251, 191, 36, 0.08);
+    color: var(--theme-accent-gold);
+    border: 1px solid rgba(251, 191, 36, 0.28);
+}
+
+.employee-dashboard-layout .badge-fun-night {
+    background: rgba(251, 191, 36, 0.12);
+    color: var(--theme-accent-gold);
+    border-color: var(--theme-accent-gold);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+}
+
+/* 30% Red Normal Hour Badge */
+.employee-dashboard-layout .badge-normal-hour {
+    background: rgba(220, 38, 38, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
+}
+
+/* 60% Black Card Canvas + 30% Red Border */
+.employee-dashboard-layout .session-card-premium {
+    background: rgba(12, 12, 16, 0.78);
+    border-color: var(--theme-card-border);
+}
+
+.employee-dashboard-layout .session-card-premium:hover {
+    border-color: var(--theme-card-hover-border);
+    box-shadow: 
+        0 20px 40px -10px rgba(0, 0, 0, 0.7),
+        0 0 20px rgba(220, 38, 38, 0.25),
+        inset 0 0 20px rgba(220, 38, 38, 0.05);
+    background: rgba(16, 16, 22, 0.88);
+}
+
+/* Avatar Crest in Crimson Red */
+.employee-dashboard-layout .user-avatar-glow {
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.45);
+}
+
+.employee-dashboard-layout .session-card-premium:hover .user-avatar-glow {
+    box-shadow: 0 0 22px rgba(220, 38, 38, 0.65);
+}
+
+/* 10% Gold Currency Price */
+.employee-dashboard-layout .session-price {
+    color: var(--theme-accent-gold);
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.35);
+}
+
+/* Progress Bar in Crimson Neon */
+.employee-dashboard-layout .progress-bar {
+    background: #dc2626;
+    box-shadow: 0 0 12px #dc2626, 0 0 4px #fff;
+}
+
+/* Urgent Alert */
+.employee-dashboard-layout .session-card-premium.urgent {
+    border-color: #ef4444;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+}
+
+.employee-dashboard-layout .session-card-premium.urgent .user-avatar-glow {
+    background: linear-gradient(135deg, #ef4444, #991b1b);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.6);
+}
+
+.employee-dashboard-layout .session-card-premium.urgent .progress-bar {
+    background: #ef4444;
+    box-shadow: 0 0 14px #ef4444, 0 0 5px #fff;
+}
+
+/* ── 5. Upcoming Bookings Color Mapping ── */
+.employee-dashboard-layout .bookings-title {
+    color: var(--theme-accent-gold);
+    text-shadow: 0 0 12px var(--theme-accent-gold-glow);
+}
+
+.employee-dashboard-layout .icon-gold {
+    color: var(--theme-accent-gold);
+    filter: drop-shadow(0 0 8px var(--theme-accent-gold-glow));
+}
+
+.employee-dashboard-layout .new-booking-btn {
+    border-color: var(--theme-accent-gold);
+    color: var(--theme-accent-gold);
+    background: transparent;
+}
+
+.employee-dashboard-layout .new-booking-btn:hover {
+    background: var(--theme-accent-gold);
+    color: #000000;
+    box-shadow: 0 0 20px var(--theme-accent-gold-glow);
+}
+
+.employee-dashboard-layout .scroll-btn {
+    background: rgba(16, 16, 22, 0.85);
+    border-color: var(--theme-card-border);
+    color: var(--theme-text-muted);
+}
+
+.employee-dashboard-layout .scroll-btn:hover {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+}
+
+/* Ticket Surfaces */
+.employee-dashboard-layout .booking-ticket {
+    background: rgba(14, 14, 18, 0.85);
+    border-color: var(--theme-card-border);
+}
+
+.employee-dashboard-layout .booking-ticket:hover {
+    border-color: var(--theme-card-hover-border);
+    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(220, 38, 38, 0.2);
+}
+
+.employee-dashboard-layout .booking-ticket.ready {
+    border-color: var(--theme-accent-gold);
+    box-shadow: 0 0 20px var(--theme-accent-gold-glow);
+}
+
+.employee-dashboard-layout .booking-ticket.overdue {
+    border-color: #ef4444;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+}
+
+.employee-dashboard-layout .ticket-action {
+    border-left-color: rgba(220, 38, 38, 0.22);
+}
+
+.employee-dashboard-layout .ticket-action::before,
+.employee-dashboard-layout .ticket-action::after {
+    background: #000000;
+    border-color: rgba(220, 38, 38, 0.22);
+}
+
+/* ── 6. Navigation Color Harmonization ── */
+.employee-dashboard-layout .top-navbar {
+    background: rgba(8, 8, 12, 0.85);
+    border-bottom-color: rgba(220, 38, 38, 0.18);
+}
+
+.employee-dashboard-layout .sidebar {
+    background: rgba(6, 6, 9, 0.98);
+    border-right-color: rgba(220, 38, 38, 0.18);
+}
+
+.employee-dashboard-layout .active-indicator {
+    background: #dc2626 !important;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.5) !important;
+}
+
+.employee-dashboard-layout .nav-item.active .glow-icon {
+    color: var(--theme-accent-gold) !important;
+    filter: drop-shadow(0 0 6px var(--theme-accent-gold-glow));
+}
+
+/* ── 7. Primary Buttons ── */
+.employee-dashboard-layout .btn-primary {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.employee-dashboard-layout .btn-primary:hover {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.6);
+    transform: translateY(-2px);
+}
+
+/* ── 8. Footer (Original Preserved) ── */
+.dashboard-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    color: var(--theme-text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}

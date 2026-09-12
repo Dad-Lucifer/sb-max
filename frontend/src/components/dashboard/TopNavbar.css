@@ -1,0 +1,424 @@
+/* TopNavbar.css */
+.top-navbar {
+    height: 70px;
+    border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+    /* Softer red trace border */
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(8, 8, 12, 0.85);
+    /* obsidian black glass */
+    transition: all 0.3s ease;
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 1.5rem;
+}
+
+.cafe-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.5px;
+    min-width: max-content;
+    white-space: nowrap;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+    display: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mobile-menu-btn:hover {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.3);
+    color: var(--accent-yellow);
+}
+
+/* --- Minimal "Addictive" Search --- */
+.search-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    /* Center it, but logically in flow */
+    max-width: 600px;
+    min-width: 0;
+}
+
+.global-search-btn {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    /* Fully rounded pill */
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.global-search-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(251, 191, 36, 0.3);
+    /* Gold hint */
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
+    /* Glow */
+    transform: translateY(-1px) scale(1.01);
+}
+
+.global-search-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Subtle "scanline" or shine effect on hover */
+.global-search-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s;
+}
+
+.global-search-btn:hover::after {
+    left: 150%;
+    transition: left 0.7s ease-in-out;
+}
+
+.search-icon-anim {
+    color: var(--text-secondary);
+    transition: color 0.3s;
+}
+
+.global-search-btn:hover .search-icon-anim {
+    color: var(--accent-yellow);
+}
+
+.search-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.search-shortcut {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- Status Badges (Minimal) --- */
+.status-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(74, 222, 128, 0.05));
+    color: #4ade80;
+    padding: 3px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.15);
+}
+
+.status-indicators {
+    display: flex;
+    gap: 1.5rem;
+    /* margin-left: auto; Removed auto margin to let it coexist with search */
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.status-item:hover {
+    opacity: 1;
+}
+
+/* --- User Actions --- */
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    position: relative;
+    transition: all 0.2s ease;
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.notification-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    background: var(--accent-yellow);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-yellow);
+}
+
+/* Dropdowns */
+.notif-dropdown,
+.profile-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: rgba(10, 15, 25, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    min-width: 280px;
+    padding: 0.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    z-index: 60;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow: hidden;
+}
+
+.profile-dropdown {
+    min-width: 180px;
+}
+
+.notif-item {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    margin-bottom: 2px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notif-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+    padding-left: 20px;
+    /* Slight slide effect */
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.profile-section:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1;
+}
+
+.profile-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.profile-role {
+    font-size: 0.7rem;
+    color: var(--accent-yellow);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.logout-btn {
+    width: 100%;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid transparent;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 1024px) {
+    .navbar-content {
+        gap: 1rem;
+    }
+
+    .status-indicators {
+        display: none;
+        /* Hide status on smaller screens to prioritize search */
+    }
+    
+    .top-navbar {
+        padding: 0 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .cafe-title {
+        font-size: 1.1rem;
+    }
+    
+    .search-wrapper {
+        max-width: none;
+        flex: 1;
+    }
+    
+    .global-search-btn {
+        max-width: 100%;
+        padding: 6px 12px;
+        border-radius: 16px;
+    }
+    
+    .search-placeholder span {
+        display: none;
+    }
+    
+    .search-shortcut {
+        display: none;
+    }
+    
+    .user-actions {
+        gap: 0.5rem;
+        padding-left: 0.5rem;
+    }
+    
+    .icon-btn {
+        padding: 8px;
+    }
+    
+    .profile-info {
+        display: none;
+    }
+    
+    .top-navbar {
+        padding: 0 1rem;
+        height: 60px;
+    }
+    
+    .notif-dropdown,
+    .profile-dropdown {
+        right: -1rem;
+        min-width: 260px;
+    }
+    
+    .profile-dropdown {
+        min-width: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-navbar {
+        padding: 0 0.75rem;
+    }
+    
+    .cafe-title {
+        font-size: 1rem;
+    }
+    
+    .global-search-btn {
+        padding: 6px 10px;
+    }
+    
+    .mobile-menu-btn {
+        padding: 6px;
+    }
+    
+    .mobile-menu-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .notif-dropdown,
+    .profile-dropdown {
+        right: -0.75rem;
+        min-width: calc(100vw - 1.5rem);
+    }
+}

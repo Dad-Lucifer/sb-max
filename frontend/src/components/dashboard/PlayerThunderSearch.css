@@ -1,0 +1,381 @@
+/* PlayerThunderSearch.css - Redesigned Premium Interface */
+/* Uses existing color palette: Gold/Amber (#fbbf24, #f59e0b) and Dark Glass */
+
+/* Backdrop */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+/* Main Modal Card */
+.modal-card {
+    width: 100%;
+    max-width: 480px;
+    max-height: 85vh;
+    background: rgba(13, 13, 16, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* existing border color */
+    border-radius: 24px;
+    padding: 0;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 24px 60px -12px rgba(0, 0, 0, 0.6),
+        0 0 50px rgba(251, 191, 36, 0.05);
+    /* existing shadow color */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.modal-header {
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(to right, rgba(251, 191, 36, 0.05), transparent);
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.modal-title-icon {
+    color: #fbbf24;
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+}
+
+.close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    /* existing error color trace */
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+/* Body Content */
+.modal-body {
+    padding: 32px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Search Section */
+.search-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-container {
+    position: relative;
+}
+
+.modal-inputs {
+    width: 100%;
+    padding: 16px 20px;
+    padding-left: 50px;
+    /* Icon on left now for variety */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-inputs:focus {
+    outline: none;
+    border-color: #fbbf24;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1);
+}
+
+.modal-inputs::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.input-icon {
+    position: absolute;
+    left: 20px;
+    /* Moved to left */
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.3);
+    transition: 0.3s ease;
+    pointer-events: none;
+}
+
+.modal-input:focus~.input-icon {
+    color: #fbbf24;
+}
+
+.search-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: none;
+    border-radius: 12px;
+    color: #1a1500;
+    /* Dark text on gold */
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.search-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(251, 191, 36, 0.4);
+}
+
+.search-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+
+/* Error Message */
+.error-message {
+    margin-top: 20px;
+    padding: 14px;
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 3px solid #ef4444;
+    border-radius: 6px;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Results Area - New Layout */
+.result-section {
+    margin-top: 32px;
+    position: relative;
+}
+
+.player-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.player-header {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.avatar-container {
+    position: relative;
+    width: 56px;
+    height: 56px;
+}
+
+.avatar-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(251, 191, 36, 0.1);
+    border: 2px solid rgba(251, 191, 36, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fbbf24;
+}
+
+.player-details {
+    flex: 1;
+}
+
+.player-name-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+}
+
+.player-phone-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+}
+
+.balance-display {
+    padding: 30px;
+    text-align: center;
+    background: radial-gradient(circle at center, rgba(251, 191, 36, 0.05), transparent 70%);
+}
+
+.balance-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.balance-amount {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fbbf24;
+    text-shadow: 0 0 40px rgba(251, 191, 36, 0.2);
+    letter-spacing: -1px;
+}
+
+/* Activity Feed - Timeline */
+.activity-section {
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.activity-header-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 10px;
+}
+
+.activity-timeline {
+    position: relative;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    margin-left: 10px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 24px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -17px;
+    /* Center on the line */
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 4px #0d0d10;
+    /* Mask the line */
+}
+
+.timeline-item.session .timeline-dot {
+    border-color: #3b82f6;
+    /* Session blue */
+    box-shadow: 0 0 0 4px #0d0d10, 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.timeline-item.battle .timeline-dot {
+    border-color: #eab308;
+    /* Battle yellow */
+    box-shadow: 0 0 0 4px #0d0d10, 0 0 10px rgba(234, 179, 8, 0.4);
+}
+
+.timeline-content {
+    /* No background card, just text for cleaner look */
+}
+
+.timeline-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin-bottom: 2px;
+}
+
+.timeline-date {
+    font-size: 0.75rem;
+    color: rgba(156, 163, 175, 0.6);
+}
+.player-dropdown{
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;
+    margin-top:6px;
+    max-height:220px;
+    overflow-y:auto;
+    z-index:20;
+}
+
+.dropdown-item{
+    padding:10px 12px;
+    cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.dropdown-item:hover{
+    background:rgba(255,255,255,0.08);
+}
+
+.dropdown-phone{
+    font-size:12px;
+    opacity:.6;
+}

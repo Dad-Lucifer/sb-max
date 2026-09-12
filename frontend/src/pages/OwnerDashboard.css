@@ -1,0 +1,533 @@
+/* --- Theme Variables --- */
+:root {
+    --primary-glow: #dc2626;
+    --secondary-glow: #fbbf24;
+    --bg-deep: #050507;
+    --glass-bg: rgba(14, 14, 18, 0.78);
+    --glass-border: rgba(220, 38, 38, 0.2);
+    --text-white: #f8fafc;
+    --text-gray: #94a3b8;
+}
+
+.owner-dashboard-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 1rem;
+    padding-bottom: 4rem;
+    color: var(--text-white);
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* --- 1. Header --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+.header-subtitle {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.header-center {
+    display: none;
+}
+
+.live-clock {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.25rem;
+    color: var(--secondary-glow);
+    text-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    border: 1px solid var(--glass-border);
+    padding: 0.4rem 1rem;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.time-filter-wrapper {
+    display: flex;
+}
+
+.header-buttons-group {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* --- 2. Hero Stats Grid --- */
+.hero-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- 3. Operational Grid (Revenue + Floor) --- */
+.operational-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-panel,
+.floor-status-panel {
+    min-width: 0;
+    height: 100%;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-wrapper {
+    flex: 1;
+    margin-top: 1rem;
+    width: 100%;
+    position: relative;
+}
+
+.floor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+    overflow-y: auto;
+    padding-right: 5px;
+    flex: 1;
+}
+
+/* --- 4. Secondary Grid (Pie + Txn) --- */
+.secondary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Transaction Widget Styles */
+.txn-panel {
+    height: 100%;
+    max-height: 380px;
+    display: flex;
+    flex-direction: column;
+}
+
+.live-badge {
+    font-size: 0.7rem;
+    color: #60a5fa;
+    font-family: monospace;
+    animation: pulse 2s infinite;
+}
+
+.txn-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.txn-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    padding: 0.625rem;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.txn-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 150px;
+}
+
+.txn-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.txn-icon.snack {
+    background: rgba(249, 115, 22, 0.15);
+    color: #f97316;
+}
+
+.txn-icon.service {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.txn-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.txn-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.txn-time {
+    font-size: 0.7rem;
+    color: var(--text-gray);
+    margin: 2px 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.txn-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.txn-amount {
+    font-weight: 700;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.txn-status {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.txn-id {
+    font-size: 0.65rem;
+    color: #64748b;
+    margin: 0;
+    font-family: monospace;
+}
+
+/* --- 5. Bottom Section (Snack + Deletion Grid) --- */
+.bottom-section {
+    margin-top: 1.5rem;
+}
+
+.snack-deletion-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+/* Scrollbar refinement */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Tablet & Smaller: <= 1024px */
+@media (max-width: 1024px) {
+    .snack-deletion-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .operational-grid,
+    .secondary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tablet: 768px - 1024px */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .owner-dashboard-container {
+        padding: 1.5rem;
+    }
+
+    .header-title {
+        font-size: 2rem;
+    }
+
+    .live-clock {
+        font-size: 1.35rem;
+        padding: 0.4rem 1.25rem;
+    }
+
+    .hero-stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .chart-panel,
+    .floor-status-panel {
+        min-height: 380px;
+    }
+}
+
+/* Desktop: 1024px+ */
+@media (min-width: 1024px) {
+    .owner-dashboard-container {
+        padding: 2rem;
+    }
+
+    .header-center {
+        display: block;
+    }
+
+    .dashboard-header {
+        align-items: center;
+    }
+
+    .header-title {
+        font-size: 2rem;
+    }
+
+    .hero-stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .operational-grid {
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    }
+
+    .secondary-grid {
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    }
+
+    .chart-panel,
+    .floor-status-panel {
+        min-height: 450px;
+    }
+
+    .txn-panel {
+        max-height: 400px;
+    }
+}
+
+/* Large Desktop: 1440px+ */
+@media (min-width: 1440px) {
+    .owner-dashboard-container {
+        padding: 2rem 3rem;
+    }
+}
+
+/* Mobile: <= 768px */
+@media (max-width: 768px) {
+    .owner-dashboard-container {
+        padding: 1rem 0.75rem 3.5rem 0.75rem;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .header-left {
+        width: 100%;
+    }
+
+    .header-title {
+        font-size: 1.65rem;
+    }
+
+    .header-center {
+        display: none;
+    }
+
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .time-filter-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .time-filter-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .time-filter-wrapper .modern-tabs {
+        width: 100%;
+        min-width: 300px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .time-filter-wrapper .modern-tab-item {
+        flex: 1;
+        text-align: center;
+        padding: 7px 4px;
+        font-size: 0.75rem;
+    }
+
+    .header-buttons-group {
+        width: 100%;
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .header-buttons-group > * {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .hero-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .operational-grid,
+    .secondary-grid,
+    .snack-deletion-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .chart-panel,
+    .floor-status-panel {
+        min-height: 320px;
+    }
+
+    .txn-item {
+        padding: 0.625rem;
+    }
+}
+
+/* Small Mobile: <= 480px */
+@media (max-width: 480px) {
+    .owner-dashboard-container {
+        padding: 0.75rem 0.5rem 3rem 0.5rem;
+    }
+
+    .header-title {
+        font-size: 1.4rem;
+    }
+
+    .header-subtitle {
+        font-size: 0.78rem;
+    }
+
+    .hero-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .chart-panel,
+    .floor-status-panel {
+        min-height: 300px;
+    }
+
+    .chart-wrapper {
+        margin-top: 0.5rem;
+    }
+
+    .txn-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .txn-left {
+        width: 100%;
+    }
+
+    .txn-right {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .txn-amount {
+        font-size: 0.95rem;
+    }
+}

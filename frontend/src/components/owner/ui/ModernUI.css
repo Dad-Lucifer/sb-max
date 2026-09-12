@@ -1,0 +1,337 @@
+/* Variables */
+:root {
+    --gold-primary: #fbbf24;
+    --gold-glow: rgba(251, 191, 36, 0.25);
+
+    --blue-dark: #050507;
+    --blue-card: rgba(14, 14, 18, 0.8);
+    --blue-highlight: #dc2626;
+
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+
+    --glass-border: rgba(220, 38, 38, 0.2);
+    --glass-shiny: rgba(255, 255, 255, 0.04);
+}
+
+.modern-glass-panel {
+    background: var(--blue-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-glass-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.35), transparent);
+}
+
+/* Typography */
+.modern-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+}
+
+/* Badges */
+.modern-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.modern-badge.positive {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.25);
+}
+
+.modern-badge.negative {
+    background: rgba(220, 38, 38, 0.12);
+    color: #f87171;
+    border-color: rgba(220, 38, 38, 0.25);
+}
+
+/* Tabs */
+.modern-tabs {
+    display: flex;
+    background: rgba(14, 14, 18, 0.85);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    width: fit-content;
+    gap: 4px;
+}
+
+.modern-tab-item {
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.modern-tab-item.active {
+    background: var(--blue-highlight);
+    color: white;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+}
+
+.modern-tab-item:hover:not(.active) {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Buttons */
+.modern-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.modern-btn.primary {
+    background: linear-gradient(135deg, var(--blue-highlight), #b91c1c);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modern-btn.ghost {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+}
+
+/* Stats */
+.stat-card-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.stat-icon-bg {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    opacity: 0.1;
+    transform: scale(1.5) rotate(10deg);
+}
+
+.stat-content {
+    position: relative;
+    z-index: 2;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.5px;
+}
+
+/* ============================================
+   RESPONSIVE STYLES
+   ============================================ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .modern-glass-panel {
+        padding: 1.25rem;
+    }
+    
+    .modern-title.text-2xl {
+        font-size: 1.35rem;
+    }
+    
+    .modern-title.text-xl {
+        font-size: 1.15rem;
+    }
+    
+    .modern-tab-item {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .modern-btn {
+        padding: 7px 14px;
+        font-size: 0.825rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .modern-glass-panel {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .modern-title {
+        margin-bottom: 0.75rem;
+    }
+    
+    .modern-title.text-2xl {
+        font-size: 1.25rem;
+    }
+    
+    .modern-title.text-xl {
+        font-size: 1.1rem;
+    }
+    
+    .modern-tabs {
+        padding: 3px;
+        border-radius: 10px;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .modern-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .modern-tab-item {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .modern-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        gap: 6px;
+    }
+    
+    .modern-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .stat-value {
+        font-size: 1.35rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .stat-icon-bg {
+        top: -5px;
+        right: -5px;
+        transform: scale(1.2) rotate(10deg);
+    }
+    
+    .modern-badge {
+        padding: 3px 6px;
+        font-size: 0.7rem;
+        gap: 3px;
+    }
+    
+    .modern-badge svg {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .modern-glass-panel {
+        padding: 0.875rem;
+        border-radius: 10px;
+    }
+    
+    .modern-title.text-2xl {
+        font-size: 1.15rem;
+    }
+    
+    .modern-title.text-xl {
+        font-size: 1rem;
+    }
+    
+    .modern-tab-item {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+    }
+    
+    .modern-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        gap: 5px;
+    }
+    
+    .modern-btn svg {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .stat-value {
+        font-size: 1.25rem;
+    }
+    
+    .flex-between {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+}
