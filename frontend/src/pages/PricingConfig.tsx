@@ -375,7 +375,7 @@ const PricingConfigPage = () => {
                     </button>
                 </nav>
 
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div className="pricing-tabs-main">
                     <main className="pricing-tabs-content">
                         {activeTab === 'hours' && renderHoursTab()}
                         {activeTab === 'consoles' && renderConsolesTab()}

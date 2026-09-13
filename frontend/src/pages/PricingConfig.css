@@ -1,14 +1,15 @@
 /* PricingConfig.css - Modern Dashboard Module Design */
 
 .pricing-dashboard-view {
-    padding: 1rem;
-    height: calc(100vh - 100px);
+    padding: 0;
+    height: calc(100vh - 135px);
+    min-height: 520px;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
     font-family: 'Outfit', sans-serif;
     color: #fff;
-    overflow: hidden;
+    box-sizing: border-box;
 }
 
 /* Success Toast Notification */
@@ -38,6 +39,7 @@
     align-items: flex-end;
     flex-wrap: wrap;
     gap: 1rem;
+    flex-shrink: 0;
 }
 
 .module-header-actions {
@@ -66,6 +68,7 @@
 .pricing-tabs-container {
     display: flex;
     flex: 1;
+    min-height: 0;
     background: rgba(14, 14, 18, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -82,6 +85,17 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.pricing-tabs-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
 }
 
 .tab-btn {
@@ -117,10 +131,30 @@
 
 .pricing-tabs-content {
     flex: 1;
-    padding: 2rem;
+    min-height: 0;
+    padding: 1.75rem 2rem 2.5rem 2rem;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: rgba(220, 38, 38, 0.4) rgba(0, 0, 0, 0.2);
+}
+
+.pricing-tabs-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pricing-tabs-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.pricing-tabs-content::-webkit-scrollbar-thumb {
+    background: rgba(220, 38, 38, 0.35);
+    border-radius: 4px;
+}
+
+.pricing-tabs-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(220, 38, 38, 0.6);
 }
 
 /* Schedule UI Enhancements - Horizontal Shift View */
@@ -458,14 +492,17 @@ input[type=number] {
 
 /* Bottom Action Bar */
 .module-actions-bar {
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 1.25rem 2rem;
+    flex-shrink: 0;
+    background: rgba(10, 14, 22, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1.1rem 2rem;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 1rem;
+    z-index: 10;
 }
 
 .btn-secondary {
@@ -540,9 +577,19 @@ input[type=number] {
     color: #e2e8f0;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1024px), (max-height: 700px) {
+    .pricing-dashboard-view {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        padding-bottom: 2rem;
+    }
+
     .pricing-tabs-container {
         flex-direction: column;
+        height: auto;
+        overflow: visible;
+        border-radius: 18px;
     }
 
     .pricing-tabs-nav {
@@ -551,7 +598,7 @@ input[type=number] {
         overflow-x: auto;
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 1rem;
+        padding: 0.75rem 1rem;
         -webkit-overflow-scrolling: touch;
     }
 
@@ -559,14 +606,40 @@ input[type=number] {
         white-space: nowrap;
         flex-shrink: 0;
     }
+
+    .pricing-tabs-main {
+        height: auto;
+        overflow: visible;
+        min-height: 0;
+    }
+
+    .pricing-tabs-content {
+        height: auto;
+        overflow-y: visible;
+        padding: 1.25rem 1rem 2.5rem 1rem;
+    }
+
+    .module-actions-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 50;
+        padding: 1rem 1.25rem;
+        background: rgba(10, 14, 22, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+    }
 }
 
 /* Mobile Devices: <= 768px */
 @media (max-width: 768px) {
     .pricing-dashboard-view {
-        padding: 0.75rem 0.5rem 6.5rem 0.5rem;
+        padding: 0.5rem 0.25rem 2rem 0.25rem;
         height: auto;
-        min-height: 100vh;
+        min-height: 0;
         overflow: visible;
         gap: 1rem;
     }
@@ -604,6 +677,7 @@ input[type=number] {
 
     .pricing-tabs-container {
         border-radius: 16px;
+        overflow: visible;
     }
 
     .pricing-tabs-nav {
@@ -627,14 +701,19 @@ input[type=number] {
         font-size: 1rem;
     }
 
+    .pricing-tabs-main {
+        overflow: visible;
+    }
+
     .pricing-tabs-content {
-        padding: 1rem 0.75rem;
+        padding: 1rem 0.75rem 2.5rem 0.75rem;
         overflow-y: visible;
     }
 
     /* Schedule Timeline on Mobile */
     .schedule-container {
         gap: 1.25rem;
+        padding-bottom: 0.5rem;
     }
 
     .day-schedule-card {
@@ -759,19 +838,21 @@ input[type=number] {
 
     /* Sticky Bottom Actions Bar on Mobile */
     .module-actions-bar {
-        position: fixed;
+        position: sticky;
         bottom: 0;
         left: 0;
         right: 0;
         z-index: 50;
         padding: 0.75rem 1rem;
-        background: rgba(10, 15, 25, 0.95);
+        background: rgba(10, 15, 25, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
         display: flex;
         gap: 0.75rem;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
     }
 
     .btn-secondary,
@@ -797,7 +878,7 @@ input[type=number] {
 /* Small Mobile: <= 480px */
 @media (max-width: 480px) {
     .pricing-dashboard-view {
-        padding: 0.5rem 0.35rem 6.5rem 0.35rem;
+        padding: 0.5rem 0.25rem 2rem 0.25rem;
     }
 
     .module-title h2 {
