@@ -193,9 +193,10 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
     // duration after extension
     const newDuration = (session.duration || 0) + (extraMinutes / 60);
 
-    /* ---------- REBUILD FULL SESSION PRICE WITH NEW STATE (matches backend) ---------- */
+    /* ---------- REBUILD FULL SESSION PRICE WITH NEW STATE (for new-member recalc path) ---------- */
     const originalStoredTotal = session.price;
 
+    // kept for reference / new-member backend path
     const recalculatedOldTotal = calculateSessionPrice(
         session.duration || 0,
         basePeopleForUpdate || 1,
@@ -212,8 +213,20 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
         config
     );
 
-    /* ---------- FINAL NEW CHARGES (delta between old and new full price) ---------- */
-    const priceDelta = Math.max(0, recalculatedNewTotal - recalculatedOldTotal);
+    /* ---------- EXTENSION PRICE: treat added time as a fresh mini-session ----------
+       +30 min → less30m (Max 30m),  +60 min → baseCost (Base 60m),
+       +90 min → baseCost + extra30mMod,  etc.
+       This avoids using extra30mMod for the first added 30-min block.
+    ---------------------------------------------------------------------------- */
+    const priceDelta = extraMinutes > 0
+        ? calculateSessionPrice(
+            extraMinutes / 60,
+            totalPeople,
+            mergedDevices,
+            new Date(session.startTime),
+            config
+        )
+        : 0;
 
     const chargesAsString =
         corePriceCorrectionDelta +
@@ -505,14 +518,14 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
                                             <FaClock style={{ display: 'inline', marginRight: '6px' }} /> Update Time
                                         </h3>
                                         <div className="minimal-counter">
-                                            <button className="counter-btn" onClick={() => setExtraMinutes(prev => Math.max(0, prev - 15))}>
+                                            <button className="counter-btn" onClick={() => setExtraMinutes(prev => Math.max(0, prev - 30))}>
                                                 <FaMinus size={12} />
                                             </button>
                                             <div className="counter-display">
                                                 <div className="counter-value">{extraMinutes}</div>
                                                 <span className="counter-label">Minutes Added</span>
                                             </div>
-                                            <button className="counter-btn" onClick={() => setExtraMinutes(prev => prev + 15)}>
+                                            <button className="counter-btn" onClick={() => setExtraMinutes(prev => prev + 30)}>
                                                 <FaPlus size={12} />
                                             </button>
                                         </div>

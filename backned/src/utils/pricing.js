@@ -167,15 +167,11 @@ const calculateSessionPrice = (
         psDistribution.forEach(p => {
             if (p === 0) return;
             const baseCost = p === 1 ? hhConf.ps5.onePerson : (p === 2 && hhConf.ps5.twoPerson ? hhConf.ps5.twoPerson : hhConf.ps5.multiplePersonBaseMod * p);
-            if (durationMinutes <= 30) {
-                grandTotal += hhConf.ps5.less30m ? (hhConf.ps5.less30m * p) : (baseCost / 2);
-            } else {
-                const fullHours = Math.max(1, Math.floor(durationMinutes / 60));
-                const partialMinutes = durationMinutes >= 60 ? durationMinutes % 60 : 0;
-                const extra30Blocks = partialMinutes > 0 ? Math.ceil(partialMinutes / 30) : 0;
-                const extraRate = (hhConf.ps5.extra30mMod || (baseCost / 2)) * (p > 2 ? p : 1);
-                grandTotal += fullHours * baseCost + (extra30Blocks * extraRate);
-            }
+            // 30m → less30m | 60m → baseCost | 90m → baseCost + less30m | 120m → 2×baseCost
+            const less30mCost = (hhConf.ps5.less30m || (baseCost / 2)) * p;
+            const fullHours = Math.floor(durationMinutes / 60);
+            const partialMinutes = durationMinutes % 60;
+            grandTotal += fullHours * baseCost + (partialMinutes > 0 ? less30mCost : 0);
         });
         // PC
         if (hhConf.pc && numPC > 0 && totalPeopleOnPC > 0) {
@@ -238,15 +234,11 @@ const calculateSessionPrice = (
         psDistribution.forEach(p => {
             if (p === 0) return;
             const baseCost = p === 1 ? nhConf.ps5.onePerson : (p === 2 && nhConf.ps5.twoPerson ? nhConf.ps5.twoPerson : nhConf.ps5.multiplePersonBaseMod * p);
-            if (durationMinutes <= 30) {
-                grandTotal += nhConf.ps5.less30m ? (nhConf.ps5.less30m * p) : (baseCost / 2);
-            } else {
-                const fullHours = Math.max(1, Math.floor(durationMinutes / 60));
-                const partialMinutes = durationMinutes >= 60 ? durationMinutes % 60 : 0;
-                const extra30Blocks = partialMinutes > 0 ? Math.ceil(partialMinutes / 30) : 0;
-                const extraRate = (nhConf.ps5.extra30mMod || (baseCost / 2)) * (p > 2 ? p : 1);
-                grandTotal += fullHours * baseCost + (extra30Blocks * extraRate);
-            }
+            // 30m → less30m | 60m → baseCost | 90m → baseCost + less30m | 120m → 2×baseCost
+            const less30mCost = (nhConf.ps5.less30m || (baseCost / 2)) * p;
+            const fullHours = Math.floor(durationMinutes / 60);
+            const partialMinutes = durationMinutes % 60;
+            grandTotal += fullHours * baseCost + (partialMinutes > 0 ? less30mCost : 0);
         });
         return grandTotal;
     }
@@ -282,15 +274,11 @@ const calculateSessionPrice = (
         psDistribution.forEach(p => {
             if (p === 0) return;
             const baseCost = p === 1 ? fnConf.ps5.onePerson : (p === 2 && fnConf.ps5.twoPerson ? fnConf.ps5.twoPerson : fnConf.ps5.multiplePersonBaseMod * p);
-            if (durationMinutes <= 30) {
-                grandTotal += fnConf.ps5.less30m ? (fnConf.ps5.less30m * p) : (baseCost / 2);
-            } else {
-                const fullHours = Math.max(1, Math.floor(durationMinutes / 60));
-                const partialMinutes = durationMinutes >= 60 ? durationMinutes % 60 : 0;
-                const extra30Blocks = partialMinutes > 0 ? Math.ceil(partialMinutes / 30) : 0;
-                const extraRate = (fnConf.ps5.extra30mMod || (baseCost / 2)) * (p > 2 ? p : 1);
-                grandTotal += fullHours * baseCost + (extra30Blocks * extraRate);
-            }
+            // 30m → less30m | 60m → baseCost | 90m → baseCost + less30m | 120m → 2×baseCost
+            const less30mCost = (fnConf.ps5.less30m || (baseCost / 2)) * p;
+            const fullHours = Math.floor(durationMinutes / 60);
+            const partialMinutes = durationMinutes % 60;
+            grandTotal += fullHours * baseCost + (partialMinutes > 0 ? less30mCost : 0);
         });
         return grandTotal;
     }
