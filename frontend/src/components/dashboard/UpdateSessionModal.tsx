@@ -191,27 +191,27 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
     const totalPeople = (basePeopleForUpdate || 1) + addedPeople;
 
     // duration after extension
-    const newDuration = (session.duration || 0) + (extraMinutes / 60);
+    // const newDuration = (session.duration || 0) + (extraMinutes / 60);
 
     /* ---------- REBUILD FULL SESSION PRICE WITH NEW STATE (for new-member recalc path) ---------- */
     const originalStoredTotal = session.price;
 
     // kept for reference / new-member backend path
-    const recalculatedOldTotal = calculateSessionPrice(
-        session.duration || 0,
-        basePeopleForUpdate || 1,
-        currentDeviceMap,
-        new Date(session.startTime),
-        config
-    );
+    // const recalculatedOldTotal = calculateSessionPrice(
+    //     session.duration || 0,
+    //     basePeopleForUpdate || 1,
+    //     currentDeviceMap,
+    //     new Date(session.startTime),
+    //     config
+    // );
 
-    const recalculatedNewTotal = calculateSessionPrice(
-        newDuration,
-        totalPeople,
-        mergedDevices,
-        new Date(session.startTime),
-        config
-    );
+    // const recalculatedNewTotal = calculateSessionPrice(
+    //     newDuration,
+    //     totalPeople,
+    //     mergedDevices,
+    //     new Date(session.startTime),
+    //     config
+    // );
 
     /* ---------- EXTENSION PRICE: treat added time as a fresh mini-session ----------
        +30 min → less30m (Max 30m),  +60 min → baseCost (Base 60m),
