@@ -167,7 +167,7 @@ const Signup = () => {
                         transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                     >
                         <div className="mobile-only-header">
-                            <h2>THUNDER</h2>
+                            <h2>SB</h2>
                         </div>
 
                         <div className="auth-header-wrapper">

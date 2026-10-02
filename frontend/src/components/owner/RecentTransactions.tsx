@@ -8,12 +8,36 @@ interface Transaction {
     item: string;
     amount: number;
     status: 'active' | 'completed';
-    time: string;
+    timestamp: string | null; // raw ISO string from backend; null if not recorded
 }
 
 interface Props {
     timeFilter: string;
 }
+
+/** Format a UTC ISO timestamp in IST using Intl — never calls new Date() for boundaries. */
+const formatTimestamp = (iso: string | null, showDate: boolean): string => {
+    if (!iso) return '—';
+    try {
+        const opts: Intl.DateTimeFormatOptions = {
+            timeZone: 'Asia/Kolkata',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+        };
+        if (showDate) {
+            opts.day = '2-digit';
+            opts.month = 'short';
+        }
+        return new Intl.DateTimeFormat('en-IN', opts).format(new Date(iso));
+    } catch {
+        return '—';
+    }
+};
+
+/** Normalise UI filter labels to backend range query params. */
+const toRangeParam = (filter: string): string =>
+    filter.toLowerCase().replace(/\s+/g, '');
 
 const RecentTransactions: React.FC<Props> = ({ timeFilter }) => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -21,19 +45,20 @@ const RecentTransactions: React.FC<Props> = ({ timeFilter }) => {
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                const range = timeFilter.toLowerCase().replace(' ', '');
-                const res = await fetch(
-                    `/api/owner/transactions?range=${range}`
-                );
+                const range = toRangeParam(timeFilter);
+                const res = await fetch(`/api/owner/transactions?range=${range}`);
                 const data = await res.json();
-                setTransactions(data);
+                setTransactions(Array.isArray(data) ? data : []);
             } catch (err) {
                 console.error('❌ Transactions fetch failed', err);
+                setTransactions([]);
             }
         };
 
         fetchTransactions();
     }, [timeFilter]);
+
+    const showDate = toRangeParam(timeFilter) !== 'today';
 
     return (
         <GlassCard className="txn-panel">
@@ -62,13 +87,13 @@ const RecentTransactions: React.FC<Props> = ({ timeFilter }) => {
                             <div className="txn-info">
                                 <p className="txn-name">{txn.item}</p>
                                 <p className="txn-time">
-                                    <FaClock size={10} /> {txn.time}
+                                    <FaClock size={10} /> {formatTimestamp(txn.timestamp, showDate)}
                                 </p>
                             </div>
                         </div>
 
                         <div className="txn-right">
-                            <p className="txn-amount">₹{txn.amount || 0}</p>
+                            <p className="txn-amount">₹{txn.amount ?? 0}</p>
                             <p className={`txn-status ${txn.status}`}>
                                 {txn.status.toUpperCase()}
                             </p>
@@ -77,7 +102,7 @@ const RecentTransactions: React.FC<Props> = ({ timeFilter }) => {
                 ))}
 
                 {transactions.length === 0 && (
-                    <p className="empty-state">No transactions found</p>
+                    <p className="empty-state">No transactions yet</p>
                 )}
             </div>
         </GlassCard>

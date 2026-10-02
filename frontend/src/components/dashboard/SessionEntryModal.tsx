@@ -566,7 +566,7 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                     </div>
 
                                     <div className="field-group">
-                                        <label className="field-label">Thunder Coins</label>
+                                        <label className="field-label">SB Coins</label>
                                         <div
                                             className="field-input"
                                             style={{
@@ -676,7 +676,7 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                     {/* Thunder coin discount */}
                                     {coinDiscount > 0 && (
                                         <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 600 }}>
-                                            ⚡ Thunder Coins Discount: -₹{coinDiscount}
+                                            ⚡ SB Coins Discount: -₹{coinDiscount}
                                         </div>
                                     )}
 

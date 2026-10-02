@@ -151,5 +151,31 @@ module.exports = {
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
+    },
+
+    updateSnack: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { name, buyingPrice, sellingPrice, quantity } = req.body;
+
+            if (!name || buyingPrice == null || sellingPrice == null || quantity == null) {
+                return res.status(400).json({ message: 'Missing fields' });
+            }
+            if (Number(sellingPrice) < Number(buyingPrice)) {
+                return res.status(400).json({ message: 'Selling price must be >= buying price' });
+            }
+
+            await db.collection('snacks').doc(id).update({
+                name,
+                buyingPrice: Number(buyingPrice),
+                sellingPrice: Number(sellingPrice),
+                quantity: Number(quantity),
+                updatedAt: new Date().toISOString()
+            });
+
+            res.status(200).json({ message: 'Snack updated successfully' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     }
 };

@@ -1,73 +1,39 @@
 const { db } = require('../config/firebase');
-
 const { calculateRevenueByMachine } = require('../utils/pricing');
+const { getRange, istHour, istDateLabel } = require('../utils/istTime');
 
 /**
  * 🔧 Helper: safely convert Firestore Timestamp or string to JS Date
  */
 const toDate = (value) => {
-  if (!value) return null;
-  if (value.toDate) return value.toDate(); // Firestore Timestamp
-  return new Date(value); // ISO string
+    if (!value) return null;
+    if (value.toDate) return value.toDate(); // Firestore Timestamp
+    return new Date(value); // ISO string
 };
 
 // Helper to get Pricing Config
 const getPricingConfig = async () => {
-  try {
-    const doc = await db.collection('settings').doc('pricing').get();
-    if (doc.exists) {
-      const data = doc.data();
-      const { getDefaultPricingConfig } = require('./pricingController');
-      const defaults = getDefaultPricingConfig();
-      const merged = { ...defaults };
-      Object.keys(data).forEach(key => {
-        if (data[key] && typeof data[key] === 'object' && !Array.isArray(data[key])) {
-          merged[key] = { ...merged[key], ...data[key] };
-        } else {
-          merged[key] = data[key];
+    try {
+        const doc = await db.collection('settings').doc('pricing').get();
+        if (doc.exists) {
+            const data = doc.data();
+            const { getDefaultPricingConfig } = require('./pricingController');
+            const defaults = getDefaultPricingConfig();
+            const merged = { ...defaults };
+            Object.keys(data).forEach(key => {
+                if (data[key] && typeof data[key] === 'object' && !Array.isArray(data[key])) {
+                    merged[key] = { ...merged[key], ...data[key] };
+                } else {
+                    merged[key] = data[key];
+                }
+            });
+            return merged;
         }
-      });
-      return merged;
+    } catch (err) {
+        console.error('Error fetching pricing for owner logic:', err);
     }
-  } catch (err) {
-    console.error("Error fetching pricing for owner logic:", err);
-  }
-  const { getDefaultPricingConfig } = require('./pricingController');
-  return getDefaultPricingConfig();
-};
-
-/**
- * 🔧 Helper: get start date from range
- */
-const getStartDate = (range) => {
-  const now = new Date();
-  let startDate = new Date();
-
-  switch (range) {
-    case 'today':
-      startDate.setHours(0, 0, 0, 0);
-      break;
-
-    case 'yesterday':
-      startDate.setDate(startDate.getDate() - 1);
-      startDate.setHours(0, 0, 0, 0);
-      break;
-
-    case 'lastweek':
-      startDate.setDate(startDate.getDate() - 7);
-      break;
-
-    case 'thismonth':
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      break;
-
-    default:
-      // Default to today if unknown
-      startDate.setHours(0, 0, 0, 0);
-      break;
-  }
-
-  return startDate;
+    const { getDefaultPricingConfig } = require('./pricingController');
+    return getDefaultPricingConfig();
 };
 
 /**
@@ -76,54 +42,50 @@ const getStartDate = (range) => {
  * ======================================================
  */
 const getOwnerDashboardStats = async (req, res) => {
-  try {
-    const { range = 'today' } = req.query;
-    const startDate = getStartDate(range);
+    try {
+        const { range = 'today' } = req.query;
+        const { start, end } = getRange(range);
 
-    // Optimized: Query filter with ISO string (since stored as string)
-    const snapshot = await db.collection('sessions')
-      .where('createdAt', '>=', startDate.toISOString())
-      .get();
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .get();
 
-    let totalRevenue = 0;
-    let totalOnlineRevenue = 0;
-    let totalCashRevenue = 0;
-    let totalDuration = 0;
-    let completedSessions = 0;
+        let totalRevenue = 0;
+        let totalOnlineRevenue = 0;
+        let totalCashRevenue = 0;
+        let totalDuration = 0;
+        let completedSessions = 0;
 
-    snapshot.forEach(doc => {
-      const s = doc.data();
-      // Double check in case of different stored formats, but query reduces load massively
-      const createdAt = toDate(s.createdAt);
-      if (!createdAt || createdAt < startDate) return;
+        snapshot.forEach(doc => {
+            const s = doc.data();
+            totalRevenue += Number(s.price || 0);
+            totalOnlineRevenue += Number(s.online || 0);
+            totalCashRevenue += Number(s.cash || 0);
+            totalDuration += Number(s.duration || 0);
+            if (s.status === 'completed') completedSessions++;
+        });
 
-      totalRevenue += Number(s.price || 0);
-      totalOnlineRevenue += Number(s.online || 0);
-      totalCashRevenue += Number(s.cash || 0);
-      totalDuration += Number(s.duration || 0);
-      if (s.status === 'completed') completedSessions++;
-    });
+        const avgSessionTime =
+            completedSessions > 0
+                ? Math.round((totalDuration / completedSessions) * 60)
+                : 0;
 
-    const avgSessionTime =
-      completedSessions > 0
-        ? Math.round((totalDuration / completedSessions) * 60)
-        : 0;
+        res.json({
+            kpiStats: [
+                { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, trend: 0 },
+                { label: 'Total Online Revenue', value: `₹${totalOnlineRevenue.toLocaleString()}`, trend: 0 },
+                { label: 'Total Cash Revenue', value: `₹${totalCashRevenue.toLocaleString()}`, trend: 0 },
+                { label: 'Completed Sessions', value: completedSessions, trend: 0 },
+                { label: 'Avg Session Time', value: `${avgSessionTime}m`, trend: 0 },
+                { label: 'Snacks Sold', value: 0, trend: 0 }
+            ]
+        });
 
-    res.json({
-      kpiStats: [
-        { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, trend: 0 },
-        { label: 'Total Online Revenue', value: `₹${totalOnlineRevenue.toLocaleString()}`, trend: 0 },
-        { label: 'Total Cash Revenue', value: `₹${totalCashRevenue.toLocaleString()}`, trend: 0 },
-        { label: 'Completed Sessions', value: completedSessions, trend: 0 },
-        { label: 'Avg Session Time', value: `${avgSessionTime}m`, trend: 0 },
-        { label: 'Snacks Sold', value: 0, trend: 0 }
-      ]
-    });
-
-  } catch (err) {
-    console.error('❌ owner dashboard error:', err);
-    res.status(500).json({ message: 'Dashboard stats error' });
-  }
+    } catch (err) {
+        console.error('❌ owner dashboard error:', err);
+        res.status(500).json({ message: 'Dashboard stats error' });
+    }
 };
 
 /**
@@ -132,41 +94,47 @@ const getOwnerDashboardStats = async (req, res) => {
  * ======================================================
  */
 const getRevenueFlow = async (req, res) => {
-  try {
-    const { range = 'today' } = req.query;
-    const startDate = getStartDate(range);
-    const groupBy = range === 'today' || range === 'yesterday' ? 'hour' : 'day';
+    try {
+        const { range = 'today' } = req.query;
+        const { start, end } = getRange(range);
+        const groupBy = (range === 'today' || range === 'yesterday') ? 'hour' : 'day';
 
-    const snapshot = await db.collection('sessions')
-      .where('createdAt', '>=', startDate.toISOString())
-      .get();
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .get();
 
-    const buckets = {};
+        const buckets = {};
 
-    snapshot.forEach(doc => {
-      const s = doc.data();
-      const createdAt = toDate(s.createdAt);
-      if (!createdAt || createdAt < startDate) return;
+        snapshot.forEach(doc => {
+            const s = doc.data();
+            const createdAt = toDate(s.createdAt);
+            if (!createdAt) return;
 
-      const key =
-        groupBy === 'hour'
-          ? String(createdAt.getHours()).padStart(2, '0')
-          : createdAt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+            const key = groupBy === 'hour'
+                ? String(istHour(createdAt)).padStart(2, '0')
+                : istDateLabel(createdAt);
 
-      buckets[key] = (buckets[key] || 0) + Number(s.price || 0);
-    });
+            buckets[key] = (buckets[key] || 0) + Number(s.price || 0);
+        });
 
-    const result = Object.entries(buckets).map(([time, amount]) => ({
-      time,
-      amount
-    }));
+        let data;
+        if (groupBy === 'hour') {
+            // Always return all 24 hour slots so chart never collapses on an empty day
+            data = Array.from({ length: 24 }, (_, h) => {
+                const key = String(h).padStart(2, '0');
+                return { time: key, amount: buckets[key] ?? 0 };
+            });
+        } else {
+            data = Object.entries(buckets).map(([time, amount]) => ({ time, amount }));
+        }
 
-    res.json({ groupBy, data: result });
+        res.json({ groupBy, data });
 
-  } catch (err) {
-    console.error('❌ revenue flow error:', err);
-    res.status(500).json({ message: 'Revenue flow error' });
-  }
+    } catch (err) {
+        console.error('❌ revenue flow error:', err);
+        res.status(500).json({ message: 'Revenue flow error' });
+    }
 };
 
 /**
@@ -175,44 +143,43 @@ const getRevenueFlow = async (req, res) => {
  * ======================================================
  */
 const getRecentTransactions = async (req, res) => {
-  try {
-    const { range = 'today' } = req.query;
-    const startDate = getStartDate(range);
+    try {
+        const { range = 'today' } = req.query;
+        const { start, end } = getRange(range);
 
-    const snapshot = await db
-      .collection('sessions')
-      .where('createdAt', '>=', startDate.toISOString())
-      .orderBy('createdAt', 'desc')
-      .limit(50)
-      .get();
+        const snapshot = await db
+            .collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .orderBy('createdAt', 'desc')
+            .limit(50)
+            .get();
 
-    const transactions = snapshot.docs
-      .map(doc => {
-        const s = doc.data();
-        const createdAt = toDate(s.createdAt);
-        if (!createdAt || createdAt < startDate) return null;
-        if (s.status !== 'completed') return null;
+        const transactions = snapshot.docs
+            .map(doc => {
+                const s = doc.data();
+                if (s.status !== 'completed') return null;
 
-        return {
-          id: doc.id,
-          item: `${s.customerName} (${s.duration}h)`,
-          amount: s.price,
-          status: s.status,
-          time: createdAt.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-          })
-        };
-      })
-      .filter(Boolean)
-      .slice(0, 15);
+                // Use completedAt when available, fall back to createdAt; never invent a timestamp
+                const ts = s.completedAt ?? s.createdAt ?? null;
 
-    res.json(transactions);
+                return {
+                    id: doc.id,
+                    item: `${s.customerName} (${s.duration}h)`,
+                    amount: s.price,
+                    status: s.status,
+                    timestamp: ts  // raw ISO string (or null) — formatted on the frontend in IST
+                };
+            })
+            .filter(Boolean)
+            .slice(0, 15);
 
-  } catch (err) {
-    console.error('❌ recent transactions error:', err);
-    res.status(500).json({ message: 'Recent transactions error' });
-  }
+        res.json(transactions);
+
+    } catch (err) {
+        console.error('❌ recent transactions error:', err);
+        res.status(500).json({ message: 'Recent transactions error' });
+    }
 };
 
 /**
@@ -220,99 +187,83 @@ const getRecentTransactions = async (req, res) => {
  * 🥧 REVENUE BY MACHINE (PIE)
  * ======================================================
  */
-
 const getRevenueByMachine = async (req, res) => {
-  try {
-    const { range = 'today' } = req.query;
-    const startDate = getStartDate(range);
+    try {
+        const { range = 'today' } = req.query;
+        const { start, end } = getRange(range);
 
-    const snapshot = await db.collection('sessions')
-      .where('createdAt', '>=', startDate.toISOString())
-      .get();
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .get();
 
-    const totals = {
-      ps: 0,
-      pc: 0,
-      vr: 0,
-      wheel: 0,
-      metabat: 0
-    };
+        const totals = { ps: 0, pc: 0, vr: 0, wheel: 0, metabat: 0 };
+        const pricingConfig = await getPricingConfig();
 
-    const pricingConfig = await getPricingConfig();
+        snapshot.forEach(doc => {
+            const s = doc.data();
+            if (s.status !== 'completed') return;
 
-    snapshot.forEach(doc => {
-      const s = doc.data();
+            const createdAt = toDate(s.createdAt);
+            if (!createdAt) return;
 
-      // Ensure status is completed (original logic did this inside loop)
-      if (s.status !== 'completed') return;
+            const split = calculateRevenueByMachine(
+                s.duration,
+                s.peopleCount,
+                s.devices,
+                createdAt,
+                pricingConfig
+            );
 
-      const createdAt = toDate(s.createdAt);
-      if (!createdAt || createdAt < startDate) return;
+            Object.keys(totals).forEach(k => {
+                totals[k] += split[k];
+            });
+        });
 
-      const split = calculateRevenueByMachine(
-        s.duration,
-        s.peopleCount,
-        s.devices,
-        createdAt,
-        pricingConfig
-      );
+        const result = Object.entries(totals)
+            .filter(([, v]) => v > 0)
+            .map(([k, v]) => ({ name: k.toUpperCase(), value: Math.round(v) }));
 
-      Object.keys(totals).forEach(k => {
-        totals[k] += split[k];
-      });
-    });
+        res.json(result);
 
-    const result = Object.entries(totals)
-      .filter(([, v]) => v > 0)
-      .map(([k, v]) => ({
-        name: k.toUpperCase(),
-        value: Math.round(v)
-      }));
-
-    res.json(result);
-
-  } catch (err) {
-    console.error('❌ revenue by machine error:', err);
-    res.status(500).json({ message: 'Revenue by machine error' });
-  }
+    } catch (err) {
+        console.error('❌ revenue by machine error:', err);
+        res.status(500).json({ message: 'Revenue by machine error' });
+    }
 };
 
-
-
-
-
-// ... existing exports
 /**
  * ======================================================
  * 🗑️ DELETION LOGS
  * ======================================================
  */
 const getDeletionLogs = async (req, res) => {
-  try {
-    const { range = 'today' } = req.query;
-    const startDate = getStartDate(range);
+    try {
+        const { range = 'today' } = req.query;
+        const { start, end } = getRange(range);
 
-    const snapshot = await db.collection('deletion_logs')
-      .where('deletedAt', '>=', startDate.toISOString())
-      .orderBy('deletedAt', 'desc')
-      .get();
+        const snapshot = await db.collection('deletion_logs')
+            .where('deletedAt', '>=', start.toISOString())
+            .where('deletedAt', '<', end.toISOString())
+            .orderBy('deletedAt', 'desc')
+            .get();
 
-    const logs = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+        const logs = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
 
-    res.json(logs);
-  } catch (err) {
-    console.error('❌ deletion logs error:', err);
-    res.status(500).json({ message: 'Deletion logs error' });
-  }
+        res.json(logs);
+    } catch (err) {
+        console.error('❌ deletion logs error:', err);
+        res.status(500).json({ message: 'Deletion logs error' });
+    }
 };
 
 module.exports = {
-  getOwnerDashboardStats,
-  getRevenueFlow,
-  getRecentTransactions,
-  getRevenueByMachine,
-  getDeletionLogs
+    getOwnerDashboardStats,
+    getRevenueFlow,
+    getRecentTransactions,
+    getRevenueByMachine,
+    getDeletionLogs
 };

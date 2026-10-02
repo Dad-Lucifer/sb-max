@@ -1,5 +1,6 @@
 const { db } = require('../config/firebase');
 const deviceLimits = require('../config/deviceLimit');
+const { istHour } = require('../utils/istTime');
 
 const getLast24HoursStats = async (req, res) => {
     try {
@@ -164,12 +165,9 @@ const getPeakHoursLast24Hours = async (req, res) => {
             const data = doc.data();
             if (!data.startTime || !data.peopleCount) return;
 
-            // 🔥 Convert to IST explicitly
+            // Convert to IST using the shared istTime helper
             const date = new Date(data.startTime);
-            const istHour = date.getUTCHours() + 5.5;
-
-            // Normalize hour (0–23)
-            const hour = Math.floor((istHour + 24) % 24);
+            const hour = istHour(date);
 
             if (hour >= 10 && hour <= 22) {
                 hourMap[hour] += Number(data.peopleCount);
@@ -454,10 +452,10 @@ const getDashboardData = async (req, res) => {
 
             // Peak hours (IST)
             if (data.startTime) {
-                const date    = new Date(data.startTime);
-                const istHour = Math.floor(((date.getUTCHours() + 5.5) + 24) % 24);
-                if (istHour >= 10 && istHour <= 22) {
-                    hourMap[istHour] += Number(data.peopleCount) || 1;
+                const date = new Date(data.startTime);
+                const hour = istHour(date);
+                if (hour >= 10 && hour <= 22) {
+                    hourMap[hour] += Number(data.peopleCount) || 1;
                 }
             }
         });

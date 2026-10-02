@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaUsers, FaUserPlus, FaUserShield, FaTrash } from 'react-icons/fa';
+import { FaTimes, FaUsers, FaUserPlus, FaUserShield, FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { auth } from '../../config/firebase';
 import './UserManagement.css';
 
@@ -30,6 +30,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
         password: '',
         role: 'employee'
     });
+    const [showPassword, setShowPassword] = useState(false);
 
     const showToast = (message: string, type: 'success' | 'error' = 'success') => {
         setToast({ message, type });
@@ -299,14 +300,25 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
                                         </div>
                                         <div className="um-form-group">
                                             <label>Temporary Password</label>
-                                            <input
-                                                type="password"
-                                                className="um-input"
-                                                required
-                                                value={formData.password}
-                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                placeholder="Min 6 characters"
-                                            />
+                                            <div className="um-password-wrapper">
+                                                <input
+                                                    type={showPassword ? 'text' : 'password'}
+                                                    className="um-input"
+                                                    required
+                                                    value={formData.password}
+                                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                    placeholder="Min 6 characters"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="um-password-toggle"
+                                                    onClick={() => setShowPassword(prev => !prev)}
+                                                    title={showPassword ? 'Hide password' : 'Show password'}
+                                                    tabIndex={-1}
+                                                >
+                                                    {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                                                </button>
+                                            </div>
                                         </div>
                                         <div className="um-form-group">
                                             <label>Role</label>

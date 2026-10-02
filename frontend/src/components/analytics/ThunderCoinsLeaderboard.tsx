@@ -129,7 +129,7 @@ const ThunderCoinsLeaderboard: React.FC<{ data: CoinEntry[]; loading?: boolean }
                             <span>{topPlayer.thunderCoins}</span>
                         </div>
                         <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#94a3b8', fontWeight: 700, marginTop: '4px' }}>
-                            Thunder Coins
+                            SB Coins
                         </span>
                     </div>
                 </motion.div>

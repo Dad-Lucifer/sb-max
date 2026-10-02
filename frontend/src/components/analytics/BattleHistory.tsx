@@ -219,7 +219,7 @@ const BattleHistory: React.FC<Props> = ({ data = [], loading = false }) => {
                                     {!isTie && (
                                         <div className="bh-coin-reward">
                                             <FaBolt />
-                                            <span>+15 Thunder Coins</span>
+                                            <span>+15 SB Coins</span>
                                         </div>
                                     )}
                                 </div>

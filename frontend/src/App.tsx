@@ -4,7 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const Login = lazy(() => import('./pages/Login'));
-const Signup = lazy(() => import('./pages/Signup'));
+// const Signup = lazy(() => import('./pages/Signup'));
 const EmployeeDashboard = lazy(() => import('./pages/EmployeeDashboard'));
 const OwnerDashboard = lazy(() => import('./pages/OwnerDashboard'));
 const PricingConfigPage = lazy(() => import('./pages/PricingConfig'));
@@ -38,7 +38,7 @@ function App() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        {/* <Route path="/signup" element={<Signup />} /> */}
 
         {/* Owner-only routes — role guard blocks URL access */}
         <Route element={<ProtectedRoute allowedRoles={['owner']} />}>

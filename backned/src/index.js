@@ -38,6 +38,6 @@ app.use('/api/users', require('./routes/userRoutes'));
 
 
 app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Thunder Gaming Cafe API is Online', status: 'active' });
+  res.status(200).json({ message: 'SB Gaming Cafe API is Online', status: 'active' });
 });
 module.exports = app

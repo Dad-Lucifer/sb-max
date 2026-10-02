@@ -292,6 +292,11 @@
     border-color: #dc2626;
 }
 
+.um-action-select option {
+    background: #1e1e2e;
+    color: #fff;
+}
+
 /* Form Styles */
 .um-form {
     display: flex;
@@ -328,11 +333,46 @@
     width: 100%;
 }
 
+/* Fix dropdown option visibility */
+.um-input option {
+    background: #1e1e2e;
+    color: #fff;
+}
+
 .um-input:focus {
     border-color: #dc2626;
     box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
     background: rgba(220, 38, 38, 0.05);
 }
+
+.um-password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.um-password-wrapper .um-input {
+    padding-right: 2.75rem;
+}
+
+.um-password-toggle {
+    position: absolute;
+    right: 0.75rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.um-password-toggle:hover {
+    color: #dc2626;
+}
+
 
 .um-submit-btn {
     background: linear-gradient(135deg, #dc2626, #6d28d9);
