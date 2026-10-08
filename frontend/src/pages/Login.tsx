@@ -16,7 +16,7 @@ interface LoginForm {
 
 const Login = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, authError } = useAuth();
 
     const [form, setForm] = useState<LoginForm>({
         username: '',
@@ -140,14 +140,14 @@ const Login = () => {
                         </div>
 
                         <form className="minimal-form" onSubmit={handleLogin}>
-                            {error && (
+                            {(error || authError) && (
                                 <motion.div
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: 'auto' }}
                                     className="alert-box"
                                 >
                                     <div className="alert-line"></div>
-                                    {error}
+                                    {error || authError}
                                 </motion.div>
                             )}
 

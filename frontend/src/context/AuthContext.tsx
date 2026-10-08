@@ -26,6 +26,7 @@ interface AppUser {
 interface AuthContextType {
   user: AppUser | null;
   loading: boolean;
+  authError: string | null;
   logout: () => Promise<void>;
 }
 
@@ -39,6 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [revoked, setRevoked] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   /* ---------------------------------------
      Auth Listener
@@ -61,6 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const res = await api.get('/api/auth/me');
 
         if (res.data?.user) {
+          setAuthError(null); // Clear any previous error on successful login
           setUser({
             uid: res.data.user.uid,
             email: res.data.user.email,
@@ -73,12 +76,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (err: unknown) {
         console.error('Failed to load user', err);
 
-        // Backend returns 403 "access has been revoked" for revoked users
         const status = (err as { response?: { status?: number } })?.response?.status;
+
         if (status === 403) {
+          // Backend explicitly revoked this user's access
           setRevoked(true);
           await signOut(auth);
+        } else if (status === 404) {
+          // Firebase Auth user exists but has no Firestore profile
+          setAuthError('Account profile not found. Please contact an administrator.');
+          await signOut(auth);
+        } else if (status === 503) {
+          // Backend is misconfigured or Firebase services are down
+          setAuthError('Server is temporarily unavailable. Please try again in a moment.');
+        } else {
+          // Network error or unexpected 5xx — surface a clear message
+          setAuthError('Could not reach the server. Please check your connection and try again.');
         }
+
         setUser(null);
       } finally {
         setLoading(false);
@@ -95,11 +110,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await signOut(auth);
     delete api.defaults.headers.common.Authorization;
     setUser(null);
+    setAuthError(null);
     navigate('/login', { replace: true });
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, authError, logout }}>
       {revoked && <RevokedAccessModal />}
       {!loading && children}
     </AuthContext.Provider>

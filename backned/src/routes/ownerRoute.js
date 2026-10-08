@@ -5,12 +5,14 @@ const {
     getRevenueFlow,
     getRecentTransactions,
     getRevenueByMachine,
-    getDeletionLogs
+    getDeletionLogs,
+    getTransactionDetail
 } = require('../controllers/ownerDashboardController');
 
 router.get('/ownerstat', getOwnerDashboardStats);
 router.get('/revenueflow', getRevenueFlow);
 router.get('/transactions', getRecentTransactions);
+router.get('/transaction/:id', getTransactionDetail);
 router.get('/revenue-by-machine', getRevenueByMachine);
 router.get('/logs', getDeletionLogs);
 

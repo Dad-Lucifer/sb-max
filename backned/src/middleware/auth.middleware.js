@@ -1,6 +1,11 @@
 const { auth, db } = require('../config/firebase');
 
 const verifyFirebaseToken = async (req, res, next) => {
+    // Guard: Firebase Auth service may be unavailable if env vars are misconfigured
+    if (!auth) {
+        return res.status(503).json({ message: 'Auth service unavailable. Check server configuration.' });
+    }
+
     try {
         const authHeader = req.headers.authorization;
 
@@ -13,9 +18,12 @@ const verifyFirebaseToken = async (req, res, next) => {
         const decodedToken = await auth.verifyIdToken(token);
 
         // Revoke access: block any further action for revoked users
-        const userDoc = await db.collection('users').doc(decodedToken.uid).get();
-        if (userDoc.exists && userDoc.data().role === 'revoked') {
-            return res.status(403).json({ message: 'Access denied. Your access has been revoked.' });
+        // Guard: db may be null if Firestore failed to initialize
+        if (db) {
+            const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+            if (userDoc.exists && userDoc.data().role === 'revoked') {
+                return res.status(403).json({ message: 'Access denied. Your access has been revoked.' });
+            }
         }
 
         req.user = decodedToken;

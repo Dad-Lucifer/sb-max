@@ -608,7 +608,7 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                                 transition: "0.2s"
                                             }}
                                         >
-                                            {coinsApplied ? "Cancel Thunder Coins" : "Apply Thunder Coins"}
+                                            {coinsApplied ? "Cancel SB Coins" : "Apply SB Coins"}
                                         </button>
                                         {coinsApplied && (
                                             <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 500 }}>

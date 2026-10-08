@@ -4,8 +4,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 try {
-  
-
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
         const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
         if (serviceAccount.private_key) {
@@ -16,24 +14,24 @@ try {
         });
         console.log('Firebase initialized with ENV variables');
     } else {
-        // Fallback or placeholder
         console.warn('WARNING: FIREBASE_SERVICE_ACCOUNT env not found. Database calls will fail until configured.');
-        // To prevent crash on require, we might not initialize or init default
-        // admin.initializeApp(); // This requires ADC or generic setup
     }
-
 } catch (error) {
     console.error('Firebase initialization error:', error);
 }
 
+// Both db and auth are guarded — they are null if Firebase failed to initialize.
+// Downstream middleware and routes must check for null before using them.
 let db = null;
+let auth = null;
+
 try {
     if (admin.apps.length > 0) {
         db = admin.firestore();
+        auth = admin.auth(); // Only call this after confirmed initialization
     }
 } catch (e) {
-    console.error('Error initializing Firestore:', e);
+    console.error('Error initializing Firebase services (Firestore/Auth):', e);
 }
-const auth = admin.auth();
 
 module.exports = { admin, db, auth };

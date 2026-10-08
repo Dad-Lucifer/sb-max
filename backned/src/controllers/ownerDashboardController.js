@@ -260,10 +260,101 @@ const getDeletionLogs = async (req, res) => {
     }
 };
 
+/**
+ * ======================================================
+ * 🔍 SINGLE TRANSACTION DETAIL
+ * ======================================================
+ */
+const getTransactionDetail = async (req, res) => {
+    if (!db) return res.status(503).json({ message: 'Database unavailable' });
+
+    try {
+        const { id } = req.params;
+        const doc = await db.collection('sessions').doc(id).get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Session not found' });
+        }
+
+        const s = doc.data();
+
+        // --- Format devices into readable labels ---
+        const deviceLabels = [];
+        if (s.devices && typeof s.devices === 'object') {
+            Object.entries(s.devices).forEach(([type, ids]) => {
+                const label = type.toUpperCase();
+                if (Array.isArray(ids)) {
+                    ids.forEach(id => { if (id) deviceLabels.push(`${label} #${id}`); });
+                } else if (typeof ids === 'number' && ids > 0) {
+                    deviceLabels.push(`${label} ×${ids}`);
+                }
+            });
+        }
+
+        // --- Snacks ---
+        const snackList = Array.isArray(s.snacks) && s.snacks.length > 0
+            ? s.snacks.map(sn => ({ name: sn.name, quantity: sn.quantity, price: sn.price ?? null }))
+            : [];
+
+        // --- Renewal / Extension history ---
+        // A session is considered "renewed" if it has members (new people joined)
+        // or if extraTime was applied (duration > originalDuration, tracked via updatedAt)
+        const wasExtended = !!(s.extraTime || (s.updatedAt && s.updatedAt !== s.createdAt && !s.members?.length));
+        const wasRenewed  = Array.isArray(s.members) && s.members.length > 0;
+
+        // Duration breakdown: hours and minutes
+        const hrs = s.duration || 0;
+        const h   = Math.floor(hrs);
+        const m   = Math.round((hrs - h) * 60);
+        const durationLabel = m > 0 ? `${h}h ${m}min` : `${h}h`;
+
+        // Payment method label
+        const cash   = Number(s.cash   || 0);
+        const online = Number(s.online || 0);
+        let paymentMethod = 'Not recorded';
+        if (cash > 0 && online > 0) paymentMethod = 'Mixed (Cash + Online)';
+        else if (cash > 0)          paymentMethod = 'Cash';
+        else if (online > 0)        paymentMethod = 'Online';
+
+        return res.status(200).json({
+            id: doc.id,
+            // Customer
+            customerName:  s.customerName  || '—',
+            contactNumber: s.contactNumber || '—',
+            gameName:      s.gameName      || null,
+            peopleCount:   s.peopleCount   || 1,
+            // Session
+            duration:      durationLabel,
+            startTime:     s.startTime   || s.createdAt || null,
+            completedAt:   s.completedAt || null,
+            status:        s.status,
+            // Devices
+            devices: deviceLabels,
+            // Snacks
+            snacks: snackList,
+            // Payment
+            totalAmount:   Number(s.price      || 0),
+            paidAmount:    Number(s.paidAmount || 0),
+            cashAmount:    cash,
+            onlineAmount:  online,
+            paymentMethod,
+            // History
+            wasExtended,
+            wasRenewed,
+            membersAdded:  Array.isArray(s.members) ? s.members.length : 0,
+        });
+
+    } catch (err) {
+        console.error('❌ getTransactionDetail error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     getOwnerDashboardStats,
     getRevenueFlow,
     getRecentTransactions,
     getRevenueByMachine,
-    getDeletionLogs
+    getDeletionLogs,
+    getTransactionDetail
 };
