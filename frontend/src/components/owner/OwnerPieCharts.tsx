@@ -27,7 +27,8 @@ interface PieData {
 }
 
 interface Props {
-    timeFilter: string;
+    timeFilter?: string;
+    monthKey?: string;
 }
 
 // --- Helper Components ---
@@ -86,7 +87,7 @@ const renderActiveShape = (props: any) => {
 };
 
 // --- Main Component ---
-const OwnerPieCharts: React.FC<Props> = ({ timeFilter }) => {
+const OwnerPieCharts: React.FC<Props> = ({ timeFilter, monthKey }) => {
     const [data, setData] = useState<PieData[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -99,11 +100,11 @@ const OwnerPieCharts: React.FC<Props> = ({ timeFilter }) => {
         const fetchRevenue = async () => {
             try {
                 setLoading(true);
-                const range = timeFilter.toLowerCase().replace(' ', '');
-                // Using the optimized endpoint
-                const res = await fetch(
-                    `/api/owner/revenue-by-machine?range=${range}`
-                );
+                const hasSubFilter = timeFilter && timeFilter !== 'All Month';
+                const url = hasSubFilter
+                    ? `/api/owner/revenue-by-machine?range=${timeFilter.toLowerCase().replace(/\s+/g, '')}`
+                    : (monthKey ? `/api/owner/month/revenue-by-machine?month=${monthKey}` : `/api/owner/revenue-by-machine?range=today`);
+                const res = await fetch(url);
                 const result = await res.json();
 
                 // Sort by value desc for better visualization
@@ -119,7 +120,7 @@ const OwnerPieCharts: React.FC<Props> = ({ timeFilter }) => {
         };
 
         fetchRevenue();
-    }, [timeFilter]);
+    }, [timeFilter, monthKey]);
 
     // Derived Stats
     const totalRevenue = useMemo(() => data.reduce((acc, curr) => acc + curr.value, 0), [data]);

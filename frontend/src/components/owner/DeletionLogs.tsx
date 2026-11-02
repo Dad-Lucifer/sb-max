@@ -20,7 +20,12 @@ const FILTERS = [
     { label: 'This Month', value: 'thismonth' }
 ];
 
-const DeletionLogs: React.FC = () => {
+interface Props {
+    monthKey?: string;
+    timeFilter?: string;
+}
+
+const DeletionLogs: React.FC<Props> = ({ monthKey, timeFilter }) => {
     const [logs, setLogs] = useState<DeletionLog[]>([]);
     const [filter, setFilter] = useState('today');
     const [loading, setLoading] = useState(true);
@@ -30,13 +35,15 @@ const DeletionLogs: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-            // Simulate slight delay for better UX on fast networks
             await new Promise(r => setTimeout(r, 400));
-            const res = await api.get(`/api/owner/logs?range=${filter}`);
+            const hasSubFilter = timeFilter && timeFilter !== 'All Month';
+            const url = hasSubFilter
+                ? `/api/owner/logs?range=${timeFilter.toLowerCase().replace(/\s+/g, '')}`
+                : (monthKey ? `/api/owner/month/logs?month=${monthKey}` : `/api/owner/logs?range=${filter}`);
+            const res = await api.get(url);
             setLogs(res.data);
         } catch (err: any) {
             console.error('Failed to fetch deletion logs', err);
-            // More descriptive error
             setError('System audit service unavailable');
         } finally {
             setLoading(false);
@@ -45,7 +52,7 @@ const DeletionLogs: React.FC = () => {
 
     useEffect(() => {
         fetchLogs();
-    }, [filter]);
+    }, [filter, monthKey, timeFilter]);
 
     const getRoleIcon = (role: string) => {
         return role.toLowerCase() === 'owner' ? <FaUserShield className="text-purple-400" /> : <FaUserTie className="text-blue-400" />;

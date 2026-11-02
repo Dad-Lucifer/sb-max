@@ -373,7 +373,7 @@ const Analytics: React.FC = () => {
                                         )}
                                     </Card>
                                     <Card
-                                        title="⚡ Thunder Coins"
+                                        title="⚡ SB Coins"
                                         desc="Loyalty program leaders"
                                         extra={
                                             <div className="an-toggle">

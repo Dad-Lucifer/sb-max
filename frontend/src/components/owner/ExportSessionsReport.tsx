@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { monthKeyToFilename, monthKeyToLabel } from '../../utils/monthFilter';
 
 /**
  * Custom Hook for handling Session Exports
+ * Accepts an optional monthKey (YYYY-MM). If provided, exports only that month's data.
  * Returns { exportData, loading }
  */
-export const useSessionExport = () => {
+export const useSessionExport = (monthKey?: string, timeFilter?: string) => {
     const [loading, setLoading] = useState(false);
 
     const exportData = async () => {
@@ -12,7 +14,19 @@ export const useSessionExport = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/sessions/export');
+            const hasSubFilter = timeFilter && timeFilter !== 'All Month';
+            let url: string;
+
+            if (hasSubFilter) {
+                const rangeParam = timeFilter.toLowerCase().replace(/\s+/g, '');
+                url = `/api/sessions/export-month?range=${rangeParam}`;
+            } else if (monthKey) {
+                url = `/api/sessions/export-month?month=${monthKey}`;
+            } else {
+                url = '/api/sessions/export';
+            }
+
+            const response = await fetch(url);
 
             if (!response.ok) {
                 const err = await response.json();
@@ -33,10 +47,36 @@ export const useSessionExport = () => {
             // 1. Create a new Workbook
             const wb = XLSX.utils.book_new();
 
-            // 2. Convert JSON to Sheet
-            const ws = XLSX.utils.json_to_sheet(data);
+            // 2. Build the title row: "SB GAMING DATABASE [ MONTH NAME ]"
+            const monthLabel = monthKey
+                ? monthKeyToLabel(monthKey).toUpperCase()
+                : new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).toUpperCase();
+            const titleText = `SB GAMING DATABASE [ ${monthLabel} ]`;
 
-            // 3. Auto-width columns (Simple heuristic)
+            // 3. Convert JSON to Sheet — prepend title rows
+            const ws = XLSX.utils.json_to_sheet([]);
+
+            // Insert title at A1
+            XLSX.utils.sheet_add_aoa(ws, [[titleText]], { origin: 'A1' });
+            // Insert blank row at A2
+            XLSX.utils.sheet_add_aoa(ws, [['']], { origin: 'A2' });
+            // Insert data headers + rows starting at A3
+            XLSX.utils.sheet_add_json(ws, data, { origin: 'A3' });
+
+            // Merge title across all columns
+            const colCount = Object.keys(data[0] || {}).length || 13;
+            ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } }];
+
+            // Style the title cell
+            if (ws['A1']) {
+                ws['A1'].s = {
+                    font: { bold: true, sz: 14, color: { rgb: 'FFFFFF' } },
+                    fill: { fgColor: { rgb: '991B1B' } },
+                    alignment: { horizontal: 'center', vertical: 'center' }
+                };
+            }
+
+            // 4. Auto-width columns
             const wscols = [
                 { wch: 25 }, // Session Entry
                 { wch: 12 }, // Date
@@ -54,17 +94,20 @@ export const useSessionExport = () => {
             ];
             ws['!cols'] = wscols;
 
-            // 4. Append Sheet
-            XLSX.utils.book_append_sheet(wb, ws, "Session Report");
+            // Row height for title row
+            ws['!rows'] = [{ hpx: 30 }, { hpx: 6 }];
 
-            // 5. Generate File Name
-            const dateStr = new Date().toISOString().split('T')[0];
-            const fileName = `Thunder_Sessions_Report_${dateStr}.xlsx`;
+            // 5. Append Sheet with month name as sheet name
+            const sheetName = monthKey ? monthKeyToLabel(monthKey).substring(0, 31) : 'Session Report';
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
-            // 6. Download
+            // 6. Generate File Name: e.g. admin-report-november-2026.xlsx or admin-report-today-november-2026.xlsx
+            const fileMonthPart = monthKey ? monthKeyToFilename(monthKey) : new Date().toISOString().split('T')[0];
+            const filterSuffix = hasSubFilter ? `-${timeFilter.toLowerCase().replace(/\s+/g, '-')}` : '';
+            const fileName = `admin-report${filterSuffix}-${fileMonthPart}.xlsx`;
+
+            // 7. Download
             XLSX.writeFile(wb, fileName);
-
-            // console.log("✅ Export successful");
 
         } catch (error) {
             console.error('Export Error:', error);

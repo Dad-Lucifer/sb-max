@@ -34,6 +34,13 @@ const getRange = (range, now = new Date()) => {
             return { start: yStart, end: todayStart };
         }
 
+        case 'dayafteryesterday':
+        case 'daybeforeyesterday': {
+            const dStart = new Date(todayStart.getTime() - 2 * 24 * 3600_000);
+            const dEnd = new Date(todayStart.getTime() - 24 * 3600_000);
+            return { start: dStart, end: dEnd };
+        }
+
         case 'lastweek': {
             const weekStart = new Date(todayStart.getTime() - 6 * 24 * 3600_000);
             return {
@@ -98,4 +105,25 @@ const istHM = (date) => {
     return { hours: shifted.getUTCHours(), minutes: shifted.getUTCMinutes() };
 };
 
-module.exports = { startOfIstDay, getRange, istHour, istDateLabel, istDay, istHM };
+/**
+ * Given a month key like "2026-11" returns { start, end } as UTC Dates (end exclusive).
+ * Month is IST-aware: midnight IST on the 1st of the month to midnight IST on 1st of next month.
+ */
+const getMonthRange = (monthKey) => {
+    // monthKey format: "YYYY-MM"
+    const [year, month] = monthKey.split('-').map(Number);
+    // IST midnight on 1st of requested month
+    const shifted = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+    // Subtract IST offset (5h30m = 330 min) to get UTC
+    const start = new Date(shifted.getTime() - IST_OFFSET_MS);
+
+    // IST midnight on 1st of next month
+    const nextMonth = month === 12 ? 1 : month + 1;
+    const nextYear  = month === 12 ? year + 1 : year;
+    const shifted2  = new Date(Date.UTC(nextYear, nextMonth - 1, 1, 0, 0, 0, 0));
+    const end       = new Date(shifted2.getTime() - IST_OFFSET_MS);
+
+    return { start, end };
+};
+
+module.exports = { startOfIstDay, getRange, getMonthRange, istHour, istDateLabel, istDay, istHM };

@@ -1,6 +1,6 @@
 const { db } = require('../config/firebase');
 const { calculateRevenueByMachine } = require('../utils/pricing');
-const { getRange, istHour, istDateLabel } = require('../utils/istTime');
+const { getRange, getMonthRange, istHour, istDateLabel } = require('../utils/istTime');
 
 /**
  * 🔧 Helper: safely convert Firestore Timestamp or string to JS Date
@@ -97,7 +97,7 @@ const getRevenueFlow = async (req, res) => {
     try {
         const { range = 'today' } = req.query;
         const { start, end } = getRange(range);
-        const groupBy = (range === 'today' || range === 'yesterday') ? 'hour' : 'day';
+        const groupBy = (range === 'today' || range === 'yesterday' || range === 'dayafteryesterday' || range === 'daybeforeyesterday') ? 'hour' : 'day';
 
         const snapshot = await db.collection('sessions')
             .where('createdAt', '>=', start.toISOString())
@@ -350,11 +350,217 @@ const getTransactionDetail = async (req, res) => {
     }
 };
 
+/**
+ * ======================================================
+ * 🗓️ MONTH STATS (KPI) — for monthly filter
+ * ======================================================
+ */
+const getMonthStats = async (req, res) => {
+    try {
+        const { month } = req.query; // e.g. "2026-11"
+        if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+            return res.status(400).json({ message: 'Invalid month format. Use YYYY-MM' });
+        }
+        const { start, end } = getMonthRange(month);
+
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .get();
+
+        let totalRevenue = 0;
+        let totalOnlineRevenue = 0;
+        let totalCashRevenue = 0;
+        let totalDuration = 0;
+        let completedSessions = 0;
+
+        snapshot.forEach(doc => {
+            const s = doc.data();
+            totalRevenue += Number(s.price || 0);
+            totalOnlineRevenue += Number(s.online || 0);
+            totalCashRevenue += Number(s.cash || 0);
+            totalDuration += Number(s.duration || 0);
+            if (s.status === 'completed') completedSessions++;
+        });
+
+        const avgSessionTime = completedSessions > 0
+            ? Math.round((totalDuration / completedSessions) * 60)
+            : 0;
+
+        res.json({
+            kpiStats: [
+                { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, trend: 0 },
+                { label: 'Total Online Revenue', value: `₹${totalOnlineRevenue.toLocaleString()}`, trend: 0 },
+                { label: 'Total Cash Revenue', value: `₹${totalCashRevenue.toLocaleString()}`, trend: 0 },
+                { label: 'Completed Sessions', value: completedSessions, trend: 0 },
+                { label: 'Avg Session Time', value: `${avgSessionTime}m`, trend: 0 },
+                { label: 'Snacks Sold', value: 0, trend: 0 }
+            ]
+        });
+    } catch (err) {
+        console.error('❌ month stats error:', err);
+        res.status(500).json({ message: 'Month stats error' });
+    }
+};
+
+/**
+ * ======================================================
+ * 📈 MONTH REVENUE FLOW (CHART)
+ * ======================================================
+ */
+const getMonthRevenueFlow = async (req, res) => {
+    try {
+        const { month } = req.query;
+        if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+            return res.status(400).json({ message: 'Invalid month format. Use YYYY-MM' });
+        }
+        const { start, end } = getMonthRange(month);
+
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .get();
+
+        const buckets = {};
+        snapshot.forEach(doc => {
+            const s = doc.data();
+            const createdAt = toDate(s.createdAt);
+            if (!createdAt) return;
+            const key = istDateLabel(createdAt);
+            buckets[key] = (buckets[key] || 0) + Number(s.price || 0);
+        });
+
+        const data = Object.entries(buckets).map(([time, amount]) => ({ time, amount }));
+        res.json({ groupBy: 'day', data });
+    } catch (err) {
+        console.error('❌ month revenue flow error:', err);
+        res.status(500).json({ message: 'Month revenue flow error' });
+    }
+};
+
+/**
+ * ======================================================
+ * 🧾 MONTH TRANSACTIONS
+ * ======================================================
+ */
+const getMonthTransactions = async (req, res) => {
+    try {
+        const { month } = req.query;
+        if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+            return res.status(400).json({ message: 'Invalid month format. Use YYYY-MM' });
+        }
+        const { start, end } = getMonthRange(month);
+
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .orderBy('createdAt', 'desc')
+            .limit(50)
+            .get();
+
+        const transactions = snapshot.docs
+            .map(doc => {
+                const s = doc.data();
+                if (s.status !== 'completed') return null;
+                const ts = s.completedAt ?? s.createdAt ?? null;
+                return {
+                    id: doc.id,
+                    item: `${s.customerName} (${s.duration}h)`,
+                    amount: s.price,
+                    status: s.status,
+                    timestamp: ts
+                };
+            })
+            .filter(Boolean)
+            .slice(0, 15);
+
+        res.json(transactions);
+    } catch (err) {
+        console.error('❌ month transactions error:', err);
+        res.status(500).json({ message: 'Month transactions error' });
+    }
+};
+
+/**
+ * ======================================================
+ * 🥧 MONTH REVENUE BY MACHINE
+ * ======================================================
+ */
+const getMonthRevenueByMachine = async (req, res) => {
+    try {
+        const { month } = req.query;
+        if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+            return res.status(400).json({ message: 'Invalid month format. Use YYYY-MM' });
+        }
+        const { start, end } = getMonthRange(month);
+
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .get();
+
+        const totals = { ps: 0, pc: 0, vr: 0, wheel: 0, metabat: 0 };
+        const pricingConfig = await getPricingConfig();
+
+        snapshot.forEach(doc => {
+            const s = doc.data();
+            if (s.status !== 'completed') return;
+            const createdAt = toDate(s.createdAt);
+            if (!createdAt) return;
+            const split = calculateRevenueByMachine(
+                s.duration, s.peopleCount, s.devices, createdAt, pricingConfig
+            );
+            Object.keys(totals).forEach(k => { totals[k] += split[k]; });
+        });
+
+        const result = Object.entries(totals)
+            .filter(([, v]) => v > 0)
+            .map(([k, v]) => ({ name: k.toUpperCase(), value: Math.round(v) }));
+
+        res.json(result);
+    } catch (err) {
+        console.error('❌ month revenue by machine error:', err);
+        res.status(500).json({ message: 'Month revenue by machine error' });
+    }
+};
+
+/**
+ * ======================================================
+ * 🗑️ MONTH DELETION LOGS
+ * ======================================================
+ */
+const getMonthDeletionLogs = async (req, res) => {
+    try {
+        const { month } = req.query;
+        if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+            return res.status(400).json({ message: 'Invalid month format. Use YYYY-MM' });
+        }
+        const { start, end } = getMonthRange(month);
+
+        const snapshot = await db.collection('deletion_logs')
+            .where('deletedAt', '>=', start.toISOString())
+            .where('deletedAt', '<', end.toISOString())
+            .orderBy('deletedAt', 'desc')
+            .get();
+
+        const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        res.json(logs);
+    } catch (err) {
+        console.error('❌ month deletion logs error:', err);
+        res.status(500).json({ message: 'Month deletion logs error' });
+    }
+};
+
 module.exports = {
     getOwnerDashboardStats,
     getRevenueFlow,
     getRecentTransactions,
     getRevenueByMachine,
     getDeletionLogs,
-    getTransactionDetail
+    getTransactionDetail,
+    getMonthStats,
+    getMonthRevenueFlow,
+    getMonthTransactions,
+    getMonthRevenueByMachine,
+    getMonthDeletionLogs
 };

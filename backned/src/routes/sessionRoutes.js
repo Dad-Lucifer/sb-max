@@ -13,11 +13,13 @@ const {
     deleteBooking,
     convertBookingsToSessions,
     exportSessions,
+    exportMonthSessions,
     startBooking,
     createSnackOnlySession
 } = require('../controllers/sessionController');
 
 router.get('/export', exportSessions); // Add this before parameterized routes like /:id
+router.get('/export-month', exportMonthSessions);
 router.post('/snack-only', createSnackOnlySession);
 router.post('/start', createSession);
 router.post('/start-booking/:id', startBooking);

@@ -48,7 +48,8 @@ interface TransactionDetail {
 }
 
 interface Props {
-    timeFilter: string;
+    timeFilter?: string;
+    monthKey?: string;
 }
 
 /* ─────────────────────────────────────────────
@@ -263,19 +264,22 @@ const TransactionDrawer = ({
 /* ─────────────────────────────────────────────
    Main Component
 ───────────────────────────────────────────── */
-const RecentTransactions: React.FC<Props> = ({ timeFilter }) => {
+const RecentTransactions: React.FC<Props> = ({ timeFilter, monthKey }) => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [detail, setDetail] = useState<TransactionDetail | null>(null);
     const [detailLoading, setDetailLoading] = useState(false);
 
-    const showDate = toRangeParam(timeFilter) !== 'today';
+    const hasSubFilter = timeFilter && timeFilter !== 'All Month';
+    const showDate = hasSubFilter ? toRangeParam(timeFilter) !== 'today' : true;
 
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                const range = toRangeParam(timeFilter);
-                const res = await api.get(`/api/owner/transactions?range=${range}`);
+                const url = hasSubFilter
+                    ? `/api/owner/transactions?range=${toRangeParam(timeFilter)}`
+                    : (monthKey ? `/api/owner/month/transactions?month=${monthKey}` : `/api/owner/transactions?range=today`);
+                const res = await api.get(url);
                 setTransactions(Array.isArray(res.data) ? res.data : []);
             } catch (err) {
                 console.error('❌ Transactions fetch failed', err);
@@ -283,7 +287,7 @@ const RecentTransactions: React.FC<Props> = ({ timeFilter }) => {
             }
         };
         fetchTransactions();
-    }, [timeFilter]);
+    }, [timeFilter, monthKey]);
 
     const openDetail = useCallback(async (id: string) => {
         setSelectedId(id);

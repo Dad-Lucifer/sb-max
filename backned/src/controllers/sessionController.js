@@ -2,6 +2,7 @@ const { db } = require('../config/firebase');
 const deviceLimits = require("../config/deviceLimit");
 const { calculateSessionPrice, isHappyHourTime, isFunNightTime, isNormalHourTime } = require('../utils/pricing');
 const snackService = require('../services/snackService'); // Import SnackService
+const { getRange, getMonthRange } = require('../utils/istTime');
 
 // Helper to transform device counts object to array of objects for frontend
 const transformDevicesToArray = (deviceData) => {
@@ -563,6 +564,96 @@ const exportSessions = async (req, res) => {
     } catch (error) {
         console.error('❌ Export sessions error:', error);
         res.status(500).json({ message: 'Failed to export sessions' });
+    }
+};
+
+/**
+ * Export sessions filtered to a specific calendar month (IST-aware).
+ * GET /api/sessions/export-month?month=2026-11
+ */
+const exportMonthSessions = async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ message: 'Database not initialized' });
+
+        const { month, range } = req.query;
+        let dateRange;
+
+        if (range) {
+            dateRange = getRange(range);
+        } else if (month && /^\d{4}-\d{2}$/.test(month)) {
+            dateRange = getMonthRange(month);
+        } else {
+            return res.status(400).json({ message: 'Invalid parameters. Provide month (YYYY-MM) or range' });
+        }
+
+        const { start, end } = dateRange;
+
+        const snapshot = await db.collection('sessions')
+            .where('createdAt', '>=', start.toISOString())
+            .where('createdAt', '<', end.toISOString())
+            .orderBy('createdAt', 'desc')
+            .get();
+
+        const pricingConfigExport = await getPricingConfig();
+
+        const data = snapshot.docs.map(doc => {
+            const s = doc.data();
+            const startStr = s.startTime;
+            const startTime = startStr ? (s.startTime.toDate ? s.startTime.toDate() : new Date(startStr)) : null;
+
+            let timeCategory = 'Unknown';
+            if (startTime && pricingConfigExport) {
+                if (isFunNightTime(startTime, pricingConfigExport)) timeCategory = 'Fun Night';
+                else if (isNormalHourTime(startTime, pricingConfigExport)) timeCategory = 'Normal Hour';
+                else if (isHappyHourTime(startTime, pricingConfigExport)) timeCategory = 'Happy Hour';
+                else timeCategory = 'Happy Hour';
+            }
+
+            const isRenewed = (s.members && s.members.length > 0) || (s.updatedAt && s.updatedAt !== s.createdAt);
+
+            let snacksStr = 'None';
+            if (s.snacks && Array.isArray(s.snacks) && s.snacks.length > 0) {
+                snacksStr = s.snacks.map(snack => `${snack.name} (${snack.quantity})`).join(', ');
+            }
+
+            let devicesStr = 'None';
+            if (s.devices && typeof s.devices === 'object') {
+                const deviceParts = [];
+                Object.entries(s.devices).forEach(([type, ids]) => {
+                    if (Array.isArray(ids) && ids.length > 0) {
+                        const typeLabel = type.toUpperCase();
+                        ids.forEach(id => { if (id) deviceParts.push(`${typeLabel}${id}`); });
+                    }
+                });
+                devicesStr = deviceParts.length > 0 ? deviceParts.join(', ') : 'None';
+            }
+
+            return {
+                "Session Entry": startTime ? startTime.toISOString() : 'N/A',
+                "Date": startTime ? startTime.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }) : 'N/A',
+                "Time": startTime ? startTime.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) : 'N/A',
+                "Name": s.customerName || 'N/A',
+                "Phone Number": s.contactNumber || 'N/A',
+                "Devices": devicesStr,
+                "Duration": (() => {
+                    const hrs = s.duration || 0;
+                    const h = Math.floor(hrs);
+                    const m = Math.round((hrs - h) * 60);
+                    return m > 0 ? `${h} hr ${m} min` : `${h} hr`;
+                })(),
+                "Snacks": snacksStr,
+                "Session Renewed": isRenewed ? "Yes" : "No",
+                "Total Amount": s.price || 0,
+                "Cash": s.cash || 0,
+                "Online": s.online || 0,
+                "Joined During": timeCategory
+            };
+        });
+
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('? Export month sessions error:', error);
+        res.status(500).json({ message: 'Failed to export month sessions' });
     }
 };
 
@@ -1190,6 +1281,7 @@ module.exports = {
     createBooking,
     getUpcomingBookings,
     exportSessions,
+    exportMonthSessions,
     getDeviceAvailability,
     getDeviceAvailabilityForTime,
     updateSession,
