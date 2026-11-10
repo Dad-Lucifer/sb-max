@@ -1,60 +1,24 @@
 const { db } = require("../config/firebase");
+const { cached } = require("../utils/cache");
 
-/**
- * Search customers from sessions + bookings + battles
- * Returns unique { name, phone }
- */
 exports.searchCustomers = async (req, res) => {
     try {
-        const query = (req.query.name || "").toLowerCase().trim();
+        const q = (req.query.name || "").toLowerCase().trim();
+        if (q.length < 2 || q.length > 40) return res.json([]);
 
-        if (query.length < 2) {
-            return res.json([]);
-        }
-
-        const collections = ["sessions", "bookings", "battles"];
-        const customers = new Map();
-
-        for (const col of collections) {
-            const snapshot = await db.collection(col).get();
-
-            snapshot.forEach(doc => {
-                const data = doc.data() || {};
-
-                // ---- sessions & bookings ----
-                if (data.customerName && data.contactNumber) {
-                    if (data.customerName.toLowerCase().includes(query)) {
-                        customers.set(data.contactNumber, {
-                            name: data.customerName,
-                            phone: data.contactNumber
-                        });
-                    }
-                }
-
-                // ---- battles crownHolder ----
-                if (data.crownHolder && data.crownHolder.name && data.crownHolder.phone) {
-                    if (data.crownHolder.name.toLowerCase().includes(query)) {
-                        customers.set(data.crownHolder.phone, {
-                            name: data.crownHolder.name,
-                            phone: data.crownHolder.phone
-                        });
-                    }
-                }
-
-                // ---- battles challenger ----
-                if (data.challenger && data.challenger.name && data.challenger.phone) {
-                    if (data.challenger.name.toLowerCase().includes(query)) {
-                        customers.set(data.challenger.phone, {
-                            name: data.challenger.name,
-                            phone: data.challenger.phone
-                        });
-                    }
-                }
-            });
-        }
-
-        return res.json(Array.from(customers.values()).slice(0, 8));
-
+        const firstWord = q.split(/\s+/)[0];
+        const results = await cached(`customers:q:${q}`, 60_000, async () => {
+            const snap = await db.collection('customers')
+                .where('searchKeys', 'array-contains', firstWord.slice(0, 15))
+                .limit(20)
+                .get();
+            return snap.docs
+                .map(d => d.data())
+                .filter(c => c.nameLower.includes(q))
+                .slice(0, 8)
+                .map(c => ({ name: c.name, phone: c.phone }));
+        });
+        res.json(results);
     } catch (err) {
         console.error("Customer search error:", err);
         res.status(500).json({ message: "Customer search failed" });

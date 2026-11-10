@@ -12,7 +12,7 @@ import {
   FaCheckCircle,
   FaPhone
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../utils/api';
 import './BookingModal.css';
 import { useToast } from '../../context/ToastContext';
 
@@ -78,8 +78,8 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
     const timer = setTimeout(async () => {
       try {
         setIsSearching(true);
-        const res = await axios.get(
-          "https://lavenderblush-chicken-803718.hostingersite.com/api/customers/search",
+        const res = await api.get(
+          "/api/customers/search",
           { params: { name: form.customerName.trim() } }
         );
         if (!cancel) {
@@ -131,8 +131,8 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       const startDateTime = new Date(`${form.bookingDate}T${form.bookingTime}`);
       const endDateTime = new Date(`${form.bookingDate}T${form.bookingEndTime}`);
 
-      const res = await axios.get(
-        'https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/availability-for-time',
+      const res = await api.get(
+        '/api/sessions/availability-for-time',
         {
           params: {
             startTime: startDateTime.toISOString(),
@@ -230,7 +230,7 @@ const BookingModal = ({ onClose, onSuccess }: Props) => {
       const bookingDateTime = new Date(`${form.bookingDate}T${form.bookingTime}`);
       const endDateTime = new Date(`${form.bookingDate}T${form.bookingEndTime}`);
 
-      await axios.post('https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/booking', {
+      await api.post('/api/sessions/booking', {
         customerName: form.customerName,
         contactNumber: form.contactNumber,
         peopleCount: form.peopleCount,

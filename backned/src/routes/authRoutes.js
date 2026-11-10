@@ -1,5 +1,6 @@
 const express = require('express');
 const { db } = require('../config/firebase');
+const { getUserProfile } = require('../services/dataCache');
 const router = express.Router();
 const { registerUser, loginUser, resolveusername } = require('../controllers/authController');
 const verifyFirebaseToken = require('../middleware/auth.middleware');
@@ -18,22 +19,20 @@ router.get('/me', verifyFirebaseToken, async (req, res) => {
   }
 
   try {
-    const userDoc = await db.collection('users').doc(req.user.uid).get();
+    const userData = req.userProfile || await getUserProfile(req.user.uid);
 
     // Guard: User authenticated via Firebase but has no Firestore profile
-    if (!userDoc.exists) {
+    if (!userData) {
       return res.status(404).json({ message: 'User profile not found. Please contact an administrator.' });
     }
-
-    const userData = userDoc.data();
 
     return res.status(200).json({
       message: 'Authenticated',
       user: {
         uid: req.user.uid,
         email: req.user.email,
-        username: userData?.username || req.user.name || req.user.email?.split('@')[0] || '',
-        role: userData?.role || 'employee'
+        username: userData.username || req.user.name || req.user.email?.split('@')[0] || '',
+        role: userData.role || 'employee'
       }
     });
 

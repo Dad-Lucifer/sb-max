@@ -1,4 +1,5 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/firebase');
+const { getSnackDocs, afterSnackWrite } = require('./dataCache');
 
 class SnackService {
     // Get all snacks
@@ -48,6 +49,7 @@ class SnackService {
             snackRef = await db.collection('snacks').add(finalData);
         }
 
+        afterSnackWrite();
         return { id: snackRef.id, ...finalData };
     }
 
@@ -56,7 +58,7 @@ class SnackService {
     async deductStock(items) {
         if (!items || items.length === 0) return;
 
-        return db.runTransaction(async (transaction) => {
+        const result = await db.runTransaction(async (transaction) => {
             const reads = [];
             for (const item of items) {
                 // Find doc by name

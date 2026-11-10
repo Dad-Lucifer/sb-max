@@ -3,7 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
-import axios from 'axios';
+import api from '../utils/api';
 import { motion } from 'framer-motion';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -63,7 +63,7 @@ const Login = () => {
             setLoading(true);
 
             // 1. Resolve exact email
-            const resolveRes = await axios.post('/api/auth/resolve-username', {
+            const resolveRes = await api.post('/api/auth/resolve-username', {
                 username
             });
 

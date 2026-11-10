@@ -2,18 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { FaUserCircle, FaSignOutAlt, FaSearch } from 'react-icons/fa';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { MdMenu } from 'react-icons/md';
-import axios from 'axios';
+import { useActiveSessions } from '../../hooks/useActiveSessions';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import PlayerThunderSearchModal from './PlayerThunderSearch';
 import './TopNavbar.css';
-
-interface Session {
-  id: string;
-  customer: string;
-  startTime: string;
-  duration: number;
-}
 
 interface NotificationItem {
   id: string;
@@ -62,39 +55,24 @@ const TopNavbar = ({ onMenuClick }: TopNavbarProps) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  /* 🔔 Fetch expiring sessions every 30s */
-  useEffect(() => {
-    const checkExpiring = async () => {
-      try {
-        const res = await axios.get('https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/active');
-        const sessions: Session[] = res.data;
+  const activeSessions = useActiveSessions();
+  const [tick, setTick] = useState(0);
 
-        const now = Date.now();
-
-        const expiring = sessions.filter(s => {
-          const start = new Date(s.startTime).getTime();
-          const end = start + s.duration * 60 * 60 * 1000;
-          const diff = end - now;
-          return diff > 0 && diff <= 10 * 60 * 1000; // 10 minutes
-        });
-
-        const notifs: NotificationItem[] = expiring.map(session => ({
-          id: session.id,
-          customer: session.customer,
-          startTime: session.startTime,
-          duration: session.duration
-        }));
-
-        setNotifications(notifs);
-      } catch (error) {
-        console.error("Failed to fetch sessions", error);
-      }
-    };
-
-    checkExpiring();
-    const interval = setInterval(checkExpiring, 30000);
-    return () => clearInterval(interval);
+  useEffect(() => {                       // recompute "expiring in 10 min" every 30 s — local only
+    const i = setInterval(() => setTick(t => t + 1), 30_000);
+    return () => clearInterval(i);
   }, []);
+
+  useEffect(() => {
+    const now = Date.now();
+    const notifs: NotificationItem[] = activeSessions
+      .filter(s => {
+        const diff = new Date(s.startTime).getTime() + s.duration * 3600_000 - now;
+        return diff > 0 && diff <= 10 * 60 * 1000;
+      })
+      .map(s => ({ id: s.id, customer: s.customer, startTime: s.startTime, duration: s.duration }));
+    setNotifications(notifs);
+  }, [activeSessions, tick]);
 
 
   return (

@@ -3,6 +3,11 @@ const deviceLimits = require("../config/deviceLimit");
 const { calculateSessionPrice, isHappyHourTime, isFunNightTime, isNormalHourTime } = require('../utils/pricing');
 const snackService = require('../services/snackService'); // Import SnackService
 const { getRange, getMonthRange } = require('../utils/istTime');
+const {
+    getActiveDocs, getUpcomingDocs, getPricingDoc,
+    afterSessionWrite, afterBookingWrite
+} = require('../services/dataCache');
+const { upsertCustomer } = require('../services/customerService');
 
 // Helper to transform device counts object to array of objects for frontend
 const transformDevicesToArray = (deviceData) => {
@@ -57,15 +62,8 @@ const getPricingConfig = async () => {
 
 const getDeviceAvailability = async (req, res) => {
     try {
-        const snapshot = await db
-            .collection('sessions')
-            .where('status', '==', 'active')
-            .get();
-
-        const bookingsSnapshot = await db
-            .collection('bookings')
-            .where('status', '==', 'upcoming')
-            .get();
+        const snapshot = await getActiveDocs();
+        const bookingsSnapshot = await getUpcomingDocs();
 
         const occupied = { ps: [], pc: [], vr: [], wheel: [], metabat: [] };
 
@@ -134,16 +132,9 @@ const createSession = async (req, res) => {
             await snackService.deductStock(snacks);
         }
 
-        // 1. Get currently occupied IDs
-        const snapshot = await db
-            .collection('sessions')
-            .where('status', '==', 'active')
-            .get();
-
-        const bookingsSnapshot = await db
-            .collection('bookings')
-            .where('status', '==', 'upcoming')
-            .get();
+        // 1. Get currently occupied IDs from cache
+        const snapshot = await getActiveDocs();
+        const bookingsSnapshot = await getUpcomingDocs();
 
         const occupied = { ps: [], pc: [], vr: [], wheel: [], metabat: [] };
 
@@ -248,6 +239,7 @@ const createSession = async (req, res) => {
 
 
         const docRef = await db.collection('sessions').add(newSession);
+        afterSessionWrite();
         // ================= THUNDER COIN DEDUCTION =================
         if (thunderCoinsUsed > 0 && contactNumber) {
             try {
@@ -300,9 +292,7 @@ const getActiveSessions = async (req, res) => {
     try {
         if (!db) return res.status(500).json({ message: 'Database not initialized' });
 
-        const snapshot = await db.collection('sessions')
-            .where('status', '==', 'active')
-            .get();
+        const snapshot = await getActiveDocs();
 
         const sessions = [];
         snapshot.forEach(doc => {
@@ -369,8 +359,8 @@ const createBooking = async (req, res) => {
 
         const occupied = { ps: [], pc: [], vr: [], wheel: [], metabat: [] };
 
-        // Check Active Sessions
-        const activeSessions = await db.collection('sessions').where('status', '==', 'active').get();
+        // Check Active Sessions (cached)
+        const activeSessions = await getActiveDocs();
         activeSessions.forEach(doc => {
             const s = doc.data();
             const sStart = new Date(s.startTime);
@@ -390,8 +380,8 @@ const createBooking = async (req, res) => {
             }
         });
 
-        // Check Upcoming Bookings
-        const bookings = await db.collection('bookings').where('status', '==', 'upcoming').get();
+        // Check Upcoming Bookings (cached)
+        const bookings = await getUpcomingDocs();
         bookings.forEach(doc => {
             const b = doc.data();
             const bStart = b.bookingTime?.toDate ? b.bookingTime.toDate() : new Date(b.bookingTime);
@@ -440,6 +430,7 @@ const createBooking = async (req, res) => {
         };
 
         const docRef = await db.collection('bookings').add(newBooking);
+        afterBookingWrite();
         res.status(201).json({ message: 'Booking created', bookingId: docRef.id });
 
     } catch (error) {
@@ -450,10 +441,7 @@ const createBooking = async (req, res) => {
 
 const getUpcomingBookings = async (req, res) => {
     try {
-        const snapshot = await db
-            .collection('bookings')
-            .where('status', '==', 'upcoming')
-            .get();
+        const snapshot = await getUpcomingDocs();
 
         const bookings = snapshot.docs.map(doc => {
             const data = doc.data();
@@ -671,8 +659,8 @@ const getDeviceAvailabilityForTime = async (req, res) => {
 
         const occupied = { ps: [], pc: [], vr: [], wheel: [], metabat: [] };
 
-        // 1. Check Active Sessions
-        const activeSessions = await db.collection('sessions').where('status', '==', 'active').get();
+        // 1. Check Active Sessions (cached)
+        const activeSessions = await getActiveDocs();
         activeSessions.forEach(doc => {
             const session = doc.data();
             const sStart = new Date(session.startTime);
@@ -692,8 +680,8 @@ const getDeviceAvailabilityForTime = async (req, res) => {
             }
         });
 
-        // 2. Check Upcoming Bookings
-        const upcomingBookings = await db.collection('bookings').where('status', '==', 'upcoming').get();
+        // 2. Check Upcoming Bookings (cached)
+        const upcomingBookings = await getUpcomingDocs();
         upcomingBookings.forEach(doc => {
             const b = doc.data();
             const bStart = b.bookingTime?.toDate ? b.bookingTime.toDate() : new Date(b.bookingTime);
@@ -737,7 +725,11 @@ const updateSession = async (req, res) => {
         const snap = await ref.get();
 
         if (!snap.exists) {
-            return res.status(404).json({ message: "Session not found" });
+            afterSessionWrite({ historical: true });
+            if (global.io) {
+                global.io.emit('session:deleted', { sessionId: id });
+            }
+            return res.status(404).json({ message: "Session not found or already deleted" });
         }
 
         const data = snap.data();
@@ -899,6 +891,7 @@ const updateSession = async (req, res) => {
             updatedAt: new Date().toISOString()
         });
 
+        afterSessionWrite();
 
         global.io.emit('session:updated', {
             sessionId: id
@@ -922,6 +915,7 @@ const completeSession = async (req, res) => {
             completedAt: new Date().toISOString()
         });
 
+        afterSessionWrite();
 
         global.io.emit('session:completed', { sessionId: id });
         res.json({ message: 'Session completed' });
@@ -953,10 +947,14 @@ const deleteSession = async (req, res) => {
             });
 
             await docRef.delete();
-            res.status(200).json({ message: 'Session deleted and logged successfully' });
-        } else {
-            res.status(404).json({ message: 'Session not found' });
         }
+
+        afterSessionWrite({ historical: true });
+        if (global.io) {
+            global.io.emit('session:deleted', { sessionId: id });
+        }
+
+        res.status(200).json({ message: 'Session deleted and logged successfully' });
     } catch (error) {
         console.error('Error deleting session:', error);
         res.status(500).json({ message: 'Failed to delete session' });
@@ -985,6 +983,7 @@ const deleteBooking = async (req, res) => {
             });
 
             await docRef.delete();
+            afterBookingWrite();
             res.status(200).json({ message: 'Booking deleted and logged successfully' });
         } else {
             res.status(404).json({ message: 'Booking not found' });
@@ -1106,6 +1105,11 @@ const convertBookingsToSessions = async (req, res) => {
             }
         }
 
+        if (convertedCount > 0) {
+            afterBookingWrite();
+            afterSessionWrite();
+        }
+
         console.log(`✅ Converted ${convertedCount} booking(s) to active sessions`);
 
         return res
@@ -1195,6 +1199,8 @@ const startBooking = async (req, res) => {
         
         // Remove the booking
         await docRef.delete();
+        afterBookingWrite();
+        afterSessionWrite();
 
         // Fire signals
         if (global.io) {
@@ -1267,6 +1273,7 @@ const createSnackOnlySession = async (req, res) => {
         };
 
         await db.collection('sessions').add(newSession);
+        afterSessionWrite();
 
         res.status(201).json({ message: 'Inhouse snack order recorded successfully.' });
     } catch (error) {

@@ -1,3 +1,5 @@
+import { socket } from '../../utils/socket';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaMinus } from 'react-icons/fa';
@@ -78,9 +80,13 @@ const SnackSelector: React.FC<Props> = ({ onChange }) => {
     };
 
     fetchSnacks();
-    // Poll for updates (stock changes)
-    const interval = setInterval(fetchSnacks, 30000);
-    return () => clearInterval(interval);
+    const onSnacks = () => fetchSnacks();
+    socket.on('snacks:updated', onSnacks);
+    socket.on('connect', onSnacks);
+    return () => {
+      socket.off('snacks:updated', onSnacks);
+      socket.off('connect', onSnacks);
+    };
   }, []);
 
 

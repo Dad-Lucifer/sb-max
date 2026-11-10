@@ -1,5 +1,6 @@
 const { db } = require('../config/firebase');
-const admin = require('firebase-admin');
+const admin = require('firebase-admin');
+const { upsertCustomer } = require('../services/customerService');
 
 // Backend Validation Helper
 const validatePlayer = (player) => {
@@ -61,7 +62,8 @@ exports.startBattle = async (req, res) => {
         const battleData = {
             crownHolder: p1,
             challenger: p2,
-            config: battleConfig,
+            config: battleConfig,
+            playerPhones: [p1.phone, p2.phone],
             players: [
         makeSearchablePlayer(p1),
         makeSearchablePlayer(p2)
@@ -76,7 +78,9 @@ exports.startBattle = async (req, res) => {
             createdAt: new Date().toISOString()
         };
 
-        const docRef = await db.collection('battles').add(battleData);
+        const docRef = await db.collection('battles').add(battleData);
+        upsertCustomer(p1.name, p1.phone);
+        upsertCustomer(p2.name, p2.phone);
 
         const response = {
             id: docRef.id,

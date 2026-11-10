@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const { getSubscriptionDocs, afterSubscriptionWrite } = require('../services/dataCache');
 
 /**
  * ➕ Create subscription - Optimized with validation
@@ -56,6 +57,7 @@ const createSubscription = async (req, res) => {
     };
 
     const ref = await db.collection('subscriptions').add(subscription);
+    afterSubscriptionWrite();
 
     res.status(201).json({
       id: ref.id,
@@ -76,31 +78,11 @@ const createSubscription = async (req, res) => {
  */
 const getSubscriptions = async (req, res) => {
   try {
-    const snapshot = await db
-      .collection('subscriptions')
-      .orderBy('createdAt', 'desc')
-      .get();
-
-    const subscriptions = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    // Set cache headers for better performance (cache for 30 seconds)
-    res.set('Cache-Control', 'private, max-age=30');
+    const subscriptions = await getSubscriptionDocs();
+    res.set('Cache-Control', 'private, max-age=60');
     res.json(subscriptions);
-
   } catch (err) {
     console.error('❌ getSubscriptions error:', err);
-
-    // Handle specific Firebase errors
-    if (err.code === 9) {
-      return res.status(500).json({
-        message: 'Database index required. Please check Firebase console.',
-        error: 'INDEX_REQUIRED'
-      });
-    }
-
     res.status(500).json({
       message: 'Failed to fetch subscriptions',
       error: 'SERVER_ERROR'
@@ -122,17 +104,8 @@ const deleteSubscription = async (req, res) => {
       });
     }
 
-    // Check if subscription exists before deleting
-    const doc = await db.collection('subscriptions').doc(id).get();
-
-    if (!doc.exists) {
-      return res.status(404).json({
-        message: 'Subscription not found',
-        error: 'NOT_FOUND'
-      });
-    }
-
     await db.collection('subscriptions').doc(id).delete();
+    afterSubscriptionWrite();
 
     res.status(200).json({
       message: 'Subscription deleted successfully',

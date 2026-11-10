@@ -31,16 +31,16 @@ exports.getPlayerActivity = async (req, res) => {
         /* ================= BATTLES ================= */
 
         const battleSnap = await db.collection('battles')
-            .where('status', 'in', ['completed', 'active'])
-            .limit(200)
+            .where('playerPhones', 'array-contains', phone)
+            .limit(100)
             .get();
 
         battleSnap.forEach(doc => {
             const b = doc.data();
 
-            const isPlayer = (b.players || []).some(p => p.phone === phone);
+            const isPlayer = true; // already filtered by playerPhones index
 
-            if (isPlayer) {
+            if (isPlayer && (b.status === 'completed' || b.status === 'active')) {
                 const battleType = `${b.config?.matchType || 'Match'} ${b.config?.gameType || ''}`.trim();
 
                 activity.push({

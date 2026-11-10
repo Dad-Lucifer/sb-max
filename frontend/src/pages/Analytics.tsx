@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import api, { API_BASE_URL } from '../utils/api';
+import api from '../utils/api';
+import { socket } from '../utils/socket';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaUserFriends, FaGamepad, FaHamburger,
     FaTrophy, FaClock, FaSync
 } from 'react-icons/fa';
 import { MdDashboard, MdFastfood } from 'react-icons/md';
-import { io } from 'socket.io-client';
 
 import DashboardLayout from '../layouts/DashboardLayout';
 
@@ -145,13 +145,16 @@ const Analytics: React.FC = () => {
             // ── Fetch only what's stale ──
             const fetches: Promise<any>[] = [];
             if (!cachedDash)    fetches.push(api.get('/api/analytics/dashboard'));
-            if (!cachedBattles) fetches.push(
-                Promise.all([
-                    api.get('/api/battles/completed'),
-                    api.get('/api/battles/thunder-leaderboard?range=weekly'),
-                    api.get('/api/battles/thunder-leaderboard?range=monthly'),
-                ])
-            );
+                        if (!cachedBattles) {
+                const lb = api.get('/api/battles/thunder-leaderboard');
+                fetches.push(
+                    Promise.all([
+                        api.get('/api/battles/completed'),
+                        lb,
+                        lb,
+                    ])
+                );
+            }
 
             const results = await Promise.allSettled(fetches);
 
@@ -200,10 +203,11 @@ const Analytics: React.FC = () => {
 
     const fetchBattlesOnly = useCallback(async () => {
         try {
+                        const lb = api.get('/api/battles/thunder-leaderboard');
             const [bR, cwR, cmR] = await Promise.all([
                 api.get('/api/battles/completed'),
-                api.get('/api/battles/thunder-leaderboard?range=weekly'),
-                api.get('/api/battles/thunder-leaderboard?range=monthly'),
+                lb,
+                lb,
             ]);
             const battleData = {
                 battles: Array.isArray(bR?.data) ? bR.data : [],
@@ -234,13 +238,13 @@ const Analytics: React.FC = () => {
 
     // Real-time socket listener for battle completion
     useEffect(() => {
-        const socket = io(API_BASE_URL, { transports: ['websocket'] });
-        socket.on('battle:finished', () => {
+        const handleBattleFinished = () => {
             sessionStorage.removeItem(CACHE_KEY_BATTLES);
             fetchBattlesOnly();
-        });
+        };
+        socket.on('battle:finished', handleBattleFinished);
         return () => {
-            socket.disconnect();
+            socket.off('battle:finished', handleBattleFinished);
         };
     }, [fetchBattlesOnly]);
 

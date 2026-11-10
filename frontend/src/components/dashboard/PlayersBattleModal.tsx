@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaCrown, FaTimes, FaGamepad, FaUsers
@@ -129,7 +129,7 @@ const PlayersBattleModal = ({ isOpen, onClose }: Props) => {
             try {
                 setIsSearchingP1(true);
 
-                const res = await axios.get(
+                const res = await api.get(
                     "/api/customers/search",
                     { params: { name: crownHolder.name.trim() } }
                 );
@@ -168,7 +168,7 @@ const PlayersBattleModal = ({ isOpen, onClose }: Props) => {
             try {
                 setIsSearchingP2(true);
 
-                const res = await axios.get(
+                const res = await api.get(
                     "/api/customers/search",
                     { params: { name: challenger.name.trim() } }
                 );
@@ -254,7 +254,7 @@ const PlayersBattleModal = ({ isOpen, onClose }: Props) => {
                 config
             };
 
-            await axios.post('/api/battles/start', payload);
+            await api.post('/api/battles/start', payload);
 
             // alert('Battle Started! ⚔️'); 
             // Better UX: No alert, just close and show toast (if available), or simple auto-close

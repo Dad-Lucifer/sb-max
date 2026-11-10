@@ -1,7 +1,8 @@
+import api from '../../utils/api';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes, FaUsers, FaUserPlus, FaUserShield, FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { auth } from '../../config/firebase';
 import './UserManagement.css';
 
 interface User {
@@ -40,18 +41,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const token = await auth.currentUser?.getIdToken();
-            const res = await fetch('/api/users', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || 'Failed to fetch users');
-            }
-            const data = await res.json();
-            setUsers(data);
+            const res = await api.get('/api/users');
+            setUsers(res.data);
         } catch (error: any) {
             console.error('Fetch Users Error:', error);
             showToast(error.message, 'error');
@@ -69,26 +60,12 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
 
     const handleRoleChange = async (uid: string, newRole: string) => {
         try {
-            const token = await auth.currentUser?.getIdToken();
-            const res = await fetch(`/api/users/${uid}/role`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ role: newRole })
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || 'Failed to update role');
-            }
-
+            await api.put(`/api/users/${uid}/role`, { role: newRole });
             showToast(`Role updated to ${newRole}`);
             fetchUsers(); // refresh
         } catch (error: any) {
             console.error('Update Role Error:', error);
-            showToast(error.message, 'error');
+            showToast(error.response?.data?.message || error.message, 'error');
         }
     };
 
@@ -96,28 +73,14 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const token = await auth.currentUser?.getIdToken();
-            const res = await fetch('/api/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || 'Failed to create user');
-            }
-
+            await api.post('/api/users', formData);
             showToast('User created successfully!');
             setFormData({ username: '', password: '', role: 'employee' });
             setActiveTab('overview');
             fetchUsers();
         } catch (error: any) {
             console.error('Create User Error:', error);
-            showToast(error.message, 'error');
+            showToast(error.response?.data?.message || error.message, 'error');
         } finally {
             setLoading(false);
         }
@@ -127,18 +90,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
         if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
         
         try {
-            const token = await auth.currentUser?.getIdToken();
-            const res = await fetch(`/api/users/${uid}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || 'Failed to delete user');
-            }
+            await api.delete(`/api/users/${uid}`);
 
             showToast('User deleted successfully!');
             fetchUsers();

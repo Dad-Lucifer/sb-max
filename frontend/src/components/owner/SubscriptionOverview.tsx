@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrash, FaCheckCircle, FaExclamationCircle, FaTimesCircle, FaCalendarAlt } from 'react-icons/fa';
 import { GlassCard, GradientTitle } from './ui/ModernComponents';
@@ -32,7 +32,7 @@ const SubscriptionOverview: React.FC = () => {
 
     const fetchSubscriptions = async () => {
         try {
-            const res = await axios.get('/api/subscription/subscriptions');
+            const res = await api.get('/api/subscription/subscriptions');
             setSubscriptions(res.data);
         } catch (err) {
             console.error('Failed to fetch subscriptions', err);
@@ -48,7 +48,7 @@ const SubscriptionOverview: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.post('/api/subscription/subscriptions', form);
+            await api.post('/api/subscription/subscriptions', form);
             setForm({
                 name: '',
                 startDate: '',
@@ -68,7 +68,7 @@ const SubscriptionOverview: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this subscription?')) return;
         try {
-            await axios.delete(`/api/subscription/subscriptions/${id}`);
+            await api.delete(`/api/subscription/subscriptions/${id}`);
             setSubscriptions(prev => prev.filter(sub => sub.id !== id));
         } catch (err) {
             console.error('Failed to delete subscription', err);

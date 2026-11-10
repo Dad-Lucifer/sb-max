@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import api from '../../utils/api';
-import { API_BASE_URL } from '../../utils/api';
+import { socket } from '../../utils/socket';
 import { FaPlaystation, FaDesktop, FaVrCardboard, FaGamepad } from 'react-icons/fa';
 import { GiSteeringWheel, GiCricketBat } from 'react-icons/gi';
 import UpdateSessionModal from './UpdateSessionModal';
 import './ActiveSessions.css';
-import { io } from 'socket.io-client';
 import { isFunNightTime, isNormalHourTime } from '../../utils/pricing';
 
 /* ---------------------------------------
@@ -22,9 +21,6 @@ const DeviceIcon = React.memo(({ type, size = 14 }: { type: string; size?: numbe
   }
 });
 
-const socket = io(API_BASE_URL, {
-  transports: ['websocket']
-});
 
 /* ---------------------------------------
    Types
@@ -182,6 +178,11 @@ const ActiveSessions = () => {
       setSessions(prev => prev.filter(s => s.id !== sessionId));
     });
 
+    socket.on('session:deleted', ({ sessionId }) => {
+      setSessions(prev => prev.filter(s => s.id !== sessionId));
+      setSelectedSession(prev => prev?.id === sessionId ? null : prev);
+    });
+
     socket.on('session:updated', async () => {
       const res = await api.get('/api/sessions/active');
       setSessions(res.data);
@@ -195,6 +196,7 @@ const ActiveSessions = () => {
     return () => {
       socket.off('session:started');
       socket.off('session:completed');
+      socket.off('session:deleted');
       socket.off('session:updated');
       socket.off('booking:converted');
     };

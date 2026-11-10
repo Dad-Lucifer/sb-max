@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { GiCrossedSwords, GiTrophyCup } from 'react-icons/gi';
 import { FaFire } from 'react-icons/fa';
-import api, { API_BASE_URL } from '../../utils/api';
-import { io } from 'socket.io-client';
+import api from '../../utils/api';
+import { socket } from '../../utils/socket';
 import './ActiveBattles.css';
 
 /* -------------------- Types -------------------- */
@@ -20,12 +20,6 @@ interface Battle {
     startTime: any; // Firestore timestamp
 }
 
-/* -------------------- Socket -------------------- */
-
-// create socket ONCE
-const socket = io(API_BASE_URL, {
-    transports: ['websocket']
-});
 
 /* -------------------- Component -------------------- */
 

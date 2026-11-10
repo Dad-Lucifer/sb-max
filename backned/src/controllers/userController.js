@@ -102,6 +102,7 @@ const updateUserRole = async (req, res) => {
         }
 
         await targetDocRef.update({ role });
+        require('../middleware/auth.middleware').clearRoleCache(uid);
 
         res.status(200).json({ message: `User role updated to ${role}` });
     } catch (error) {

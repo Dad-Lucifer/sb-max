@@ -1,3 +1,4 @@
+import { useLiveRefresh, AVAILABILITY_EVENTS } from '../../hooks/useLiveRefresh';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -120,13 +121,8 @@ const SessionEntryModal: React.FC<Props> = ({ isOpen, onClose }) => {
         }
     };
 
-    useEffect(() => {
-        if (isOpen) {
-            fetchAvailability();
-            const interval = setInterval(fetchAvailability, 30000); // Poll every 30s
-            return () => clearInterval(interval);
-        }
-    }, [isOpen]);
+    useEffect(() => { if (isOpen) fetchAvailability(); }, [isOpen]);
+    useLiveRefresh(fetchAvailability, AVAILABILITY_EVENTS, isOpen);
 
     useEffect(() => {
 

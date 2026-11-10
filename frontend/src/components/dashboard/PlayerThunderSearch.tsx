@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import axios from 'axios';
+import api from '../../utils/api';
 import {
     FaBolt,
     FaSearch,
@@ -74,16 +74,16 @@ const PlayerThunderSearchModal = ({ open, onClose }: Props) => {
 
         try {
             /* STEP 1 — verify player */
-            const playerRes = await axios.get(
-                "https://lavenderblush-chicken-803718.hostingersite.com/api/battles/thunder-player",
+            const playerRes = await api.get(
+                "/api/battles/thunder-player",
                 { params: { name, phone } }
             );
 
             setResult(playerRes.data);
 
             /* STEP 2 — fetch activity ONLY if player valid */
-            const activityRes = await axios.get(
-                "https://lavenderblush-chicken-803718.hostingersite.com/api/battles/player-activity",
+            const activityRes = await api.get(
+                "/api/battles/player-activity",
                 { params: { phone } }
             );
 
@@ -116,8 +116,8 @@ const PlayerThunderSearchModal = ({ open, onClose }: Props) => {
             try {
                 setIsSearching(true);
 
-                const res = await axios.get(
-                    "https://lavenderblush-chicken-803718.hostingersite.com/api/customers/search",
+                const res = await api.get(
+                    "/api/customers/search",
                     { params: { name: name.trim() } }
                 );
 

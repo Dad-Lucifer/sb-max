@@ -11,7 +11,9 @@ import {
   FaClock
 } from 'react-icons/fa';
 import { GiSteeringWheel, GiCricketBat } from 'react-icons/gi';
-import axios from 'axios';
+import api from '../../utils/api';
+
+import { useLiveRefresh, AVAILABILITY_EVENTS } from '../../hooks/useLiveRefresh';
 import './SessionEntry.css';
 import { calculateSessionPrice, isFunNightTime, isNormalHourTime } from '../../utils/pricing';
 import { usePricing } from '../../context/PricingContext';
@@ -93,8 +95,8 @@ const SessionEntry: React.FC = () => {
     try {
       // Backend returns limits as numbers { ps: 6 } and occupied as arrays { ps: [1,2] }
       // We need to map `limits` properly if it comes as object
-      const res = await axios.get<{ limits: Record<DeviceKeys, number>; occupied: { [key in DeviceKeys]: number[] } }>(
-        'https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/availability'
+      const res = await api.get<{ limits: Record<DeviceKeys, number>; occupied: { [key in DeviceKeys]: number[] } }>(
+        '/api/sessions/availability'
       );
       setAvailability(res.data);
     } catch (e) {
@@ -102,11 +104,10 @@ const SessionEntry: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchAvailability();
-    const interval = setInterval(fetchAvailability, 30000); // Poll every 30s
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => {
+    fetchAvailability();
+  }, []);
+  useLiveRefresh(fetchAvailability, AVAILABILITY_EVENTS);
 
 
   const [snackCost, setSnackCost] = useState<number>(0);
@@ -139,7 +140,7 @@ const SessionEntry: React.FC = () => {
         return;
       }
 
-      await axios.post('https://lavenderblush-chicken-803718.hostingersite.com/api/sessions/start', {
+      await api.post('/api/sessions/start', {
         ...form,
         duration: durationInHours,
         price: totalPrice

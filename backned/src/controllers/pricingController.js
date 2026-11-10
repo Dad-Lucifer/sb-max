@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const { getPricingDoc, afterPricingWrite } = require('../services/dataCache');
 
 const getDefaultPricingConfig = () => {
     return {
@@ -55,12 +56,11 @@ const getDefaultPricingConfig = () => {
 
 const getPricing = async (req, res) => {
     try {
-        const docRef = db.collection('settings').doc('pricing');
-        const doc = await docRef.get();
-        if (!doc.exists) {
+        const config = await getPricingDoc();
+        if (!config) {
             return res.status(200).json(getDefaultPricingConfig());
         }
-        res.status(200).json(doc.data());
+        res.status(200).json(config);
     } catch (error) {
         console.error('Error fetching pricing:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -72,6 +72,7 @@ const updatePricing = async (req, res) => {
         const newConfig = req.body;
         const docRef = db.collection('settings').doc('pricing');
         await docRef.set(newConfig);
+        afterPricingWrite();
         res.status(200).json({ message: 'Pricing updated successfully', data: newConfig });
     } catch (error) {
         console.error('Error updating pricing:', error);

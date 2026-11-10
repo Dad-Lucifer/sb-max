@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import Sidebar from '../components/dashboard/Sidebar';
 import TopNavbar from '../components/dashboard/TopNavbar';
+import { useSidebarCollapsed } from '../utils/sidebarState';
 import './DashboardLayout.css';
 
 interface DashboardLayoutProps {
@@ -10,7 +11,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children, className = '' }: DashboardLayoutProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, toggleCollapsed } = useSidebarCollapsed();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => 
     typeof window !== 'undefined' ? window.innerWidth < 768 : false
@@ -50,7 +51,7 @@ const DashboardLayout = ({ children, className = '' }: DashboardLayoutProps) => 
       {/* Sidebar */}
       <Sidebar
         isCollapsed={isCollapsed}
-        toggleCollapsed={() => setIsCollapsed(!isCollapsed)}
+        toggleCollapsed={toggleCollapsed}
         isMobile={isMobile}
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}

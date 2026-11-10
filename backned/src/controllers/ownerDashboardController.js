@@ -1,4 +1,6 @@
 const { db } = require('../config/firebase');
+const { getPricingDoc, getSessionsInRange, getSessionsSince } = require('../services/dataCache');
+const { cached } = require('../utils/cache');
 const { calculateRevenueByMachine } = require('../utils/pricing');
 const { getRange, getMonthRange, istHour, istDateLabel } = require('../utils/istTime');
 
@@ -11,14 +13,13 @@ const toDate = (value) => {
     return new Date(value); // ISO string
 };
 
-// Helper to get Pricing Config
+// Helper to get Pricing Config (cached)
 const getPricingConfig = async () => {
+    const { getDefaultPricingConfig } = require('./pricingController');
+    const defaults = getDefaultPricingConfig();
     try {
-        const doc = await db.collection('settings').doc('pricing').get();
-        if (doc.exists) {
-            const data = doc.data();
-            const { getDefaultPricingConfig } = require('./pricingController');
-            const defaults = getDefaultPricingConfig();
+        const data = await getPricingDoc();
+        if (data) {
             const merged = { ...defaults };
             Object.keys(data).forEach(key => {
                 if (data[key] && typeof data[key] === 'object' && !Array.isArray(data[key])) {
@@ -32,8 +33,7 @@ const getPricingConfig = async () => {
     } catch (err) {
         console.error('Error fetching pricing for owner logic:', err);
     }
-    const { getDefaultPricingConfig } = require('./pricingController');
-    return getDefaultPricingConfig();
+    return defaults;
 };
 
 /**
@@ -46,10 +46,7 @@ const getOwnerDashboardStats = async (req, res) => {
         const { range = 'today' } = req.query;
         const { start, end } = getRange(range);
 
-        const snapshot = await db.collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
         let totalRevenue = 0;
         let totalOnlineRevenue = 0;
@@ -99,10 +96,7 @@ const getRevenueFlow = async (req, res) => {
         const { start, end } = getRange(range);
         const groupBy = (range === 'today' || range === 'yesterday' || range === 'dayafteryesterday' || range === 'daybeforeyesterday') ? 'hour' : 'day';
 
-        const snapshot = await db.collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
         const buckets = {};
 
@@ -147,15 +141,10 @@ const getRecentTransactions = async (req, res) => {
         const { range = 'today' } = req.query;
         const { start, end } = getRange(range);
 
-        const snapshot = await db
-            .collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .orderBy('createdAt', 'desc')
-            .limit(50)
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
-        const transactions = snapshot.docs
+        const transactions = [...(snapshot.docs || snapshot)]
+            .sort((a, b) => new Date(b.data().createdAt || 0) - new Date(a.data().createdAt || 0))
             .map(doc => {
                 const s = doc.data();
                 if (s.status !== 'completed') return null;
@@ -192,10 +181,7 @@ const getRevenueByMachine = async (req, res) => {
         const { range = 'today' } = req.query;
         const { start, end } = getRange(range);
 
-        const snapshot = await db.collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
         const totals = { ps: 0, pc: 0, vr: 0, wheel: 0, metabat: 0 };
         const pricingConfig = await getPricingConfig();
@@ -242,16 +228,18 @@ const getDeletionLogs = async (req, res) => {
         const { range = 'today' } = req.query;
         const { start, end } = getRange(range);
 
-        const snapshot = await db.collection('deletion_logs')
-            .where('deletedAt', '>=', start.toISOString())
-            .where('deletedAt', '<', end.toISOString())
-            .orderBy('deletedAt', 'desc')
-            .get();
+        const logs = await cached(`logs:range:${start.toISOString()}|${end.toISOString()}`, 10 * 60_000, async () => {
+            const snapshot = await db.collection('deletion_logs')
+                .where('deletedAt', '>=', start.toISOString())
+                .where('deletedAt', '<', end.toISOString())
+                .orderBy('deletedAt', 'desc')
+                .get();
 
-        const logs = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        });
 
         res.json(logs);
     } catch (err) {
@@ -363,10 +351,7 @@ const getMonthStats = async (req, res) => {
         }
         const { start, end } = getMonthRange(month);
 
-        const snapshot = await db.collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
         let totalRevenue = 0;
         let totalOnlineRevenue = 0;
@@ -416,10 +401,7 @@ const getMonthRevenueFlow = async (req, res) => {
         }
         const { start, end } = getMonthRange(month);
 
-        const snapshot = await db.collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
         const buckets = {};
         snapshot.forEach(doc => {
@@ -451,14 +433,10 @@ const getMonthTransactions = async (req, res) => {
         }
         const { start, end } = getMonthRange(month);
 
-        const snapshot = await db.collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .orderBy('createdAt', 'desc')
-            .limit(50)
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
-        const transactions = snapshot.docs
+        const transactions = [...(snapshot.docs || snapshot)]
+            .sort((a, b) => new Date(b.data().createdAt || 0) - new Date(a.data().createdAt || 0))
             .map(doc => {
                 const s = doc.data();
                 if (s.status !== 'completed') return null;
@@ -494,10 +472,7 @@ const getMonthRevenueByMachine = async (req, res) => {
         }
         const { start, end } = getMonthRange(month);
 
-        const snapshot = await db.collection('sessions')
-            .where('createdAt', '>=', start.toISOString())
-            .where('createdAt', '<', end.toISOString())
-            .get();
+        const snapshot = await getSessionsInRange(start.toISOString(), end.toISOString());
 
         const totals = { ps: 0, pc: 0, vr: 0, wheel: 0, metabat: 0 };
         const pricingConfig = await getPricingConfig();
@@ -536,14 +511,19 @@ const getMonthDeletionLogs = async (req, res) => {
             return res.status(400).json({ message: 'Invalid month format. Use YYYY-MM' });
         }
         const { start, end } = getMonthRange(month);
+        const isPastMonth = new Date(end).getTime() <= Date.now();
+        const ttl = isPastMonth ? 30 * 24 * 60 * 60_000 : 10 * 60_000;
 
-        const snapshot = await db.collection('deletion_logs')
-            .where('deletedAt', '>=', start.toISOString())
-            .where('deletedAt', '<', end.toISOString())
-            .orderBy('deletedAt', 'desc')
-            .get();
+        const logs = await cached(`logs:month:${month}`, ttl, async () => {
+            const snapshot = await db.collection('deletion_logs')
+                .where('deletedAt', '>=', start.toISOString())
+                .where('deletedAt', '<', end.toISOString())
+                .orderBy('deletedAt', 'desc')
+                .get();
 
-        const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        });
+
         res.json(logs);
     } catch (err) {
         console.error('❌ month deletion logs error:', err);

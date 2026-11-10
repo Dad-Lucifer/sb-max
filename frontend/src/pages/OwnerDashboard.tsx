@@ -1,3 +1,5 @@
+import api from '../utils/api';
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -213,12 +215,12 @@ const OwnerDashboard: React.FC = () => {
             }
 
             const [statsRes, flowRes] = await Promise.all([
-                fetch(statsUrl),
-                fetch(flowUrl)
+                api.get(statsUrl),
+                api.get(flowUrl)
             ]);
 
-            const statsData = await statsRes.json();
-            const flowData = await flowRes.json();
+            const statsData = statsRes.data;
+            const flowData = flowRes.data;
 
             setKpiStats(statsData.kpiStats || []);
             setRevenueTrends(flowData.data || []);

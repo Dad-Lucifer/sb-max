@@ -291,9 +291,14 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
             });
             setShowDeleteConfirm(false);
             onClose();
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert("Failed to delete session");
+            if (err.response?.status === 404) {
+                setShowDeleteConfirm(false);
+                onClose();
+            } else {
+                alert("Failed to delete session");
+            }
         }
     };
 
@@ -321,9 +326,13 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
             );
 
             onClose();
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert("Failed to complete session early");
+            if (err.response?.status === 404) {
+                onClose();
+            } else {
+                alert("Failed to complete session early");
+            }
         }
     };
 
@@ -372,9 +381,14 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
             );
 
             onClose();
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert("Something went wrong");
+            if (err.response?.status === 404) {
+                alert("This session no longer exists or has already been deleted.");
+                onClose();
+            } else {
+                alert("Something went wrong");
+            }
         }
     };
 

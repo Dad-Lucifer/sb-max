@@ -1,3 +1,4 @@
+import api from '../../utils/api';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Sector } from 'recharts';
 import { motion } from 'framer-motion';
@@ -104,11 +105,11 @@ const OwnerPieCharts: React.FC<Props> = ({ timeFilter, monthKey }) => {
                 const url = hasSubFilter
                     ? `/api/owner/revenue-by-machine?range=${timeFilter.toLowerCase().replace(/\s+/g, '')}`
                     : (monthKey ? `/api/owner/month/revenue-by-machine?month=${monthKey}` : `/api/owner/revenue-by-machine?range=today`);
-                const res = await fetch(url);
-                const result = await res.json();
+                const res = await api.get(url);
+                const result = Array.isArray(res.data) ? res.data : [];
 
                 // Sort by value desc for better visualization
-                const sorted = (result || []).sort((a: PieData, b: PieData) => b.value - a.value);
+                const sorted = [...result].sort((a: PieData, b: PieData) => b.value - a.value);
                 setData(sorted);
                 // Reset active index to top performer
                 setActiveIndex(0);

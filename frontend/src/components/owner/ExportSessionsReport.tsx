@@ -1,3 +1,4 @@
+import api from '../../utils/api';
 import { useState } from 'react';
 import { monthKeyToFilename, monthKeyToLabel } from '../../utils/monthFilter';
 
@@ -26,14 +27,8 @@ export const useSessionExport = (monthKey?: string, timeFilter?: string) => {
                 url = '/api/sessions/export';
             }
 
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.message || 'Export failed');
-            }
-
-            const data = await response.json();
+            const response = await api.get(url);
+            const data = response.data;
 
             if (!data || data.length === 0) {
                 alert('No session data available to export.');

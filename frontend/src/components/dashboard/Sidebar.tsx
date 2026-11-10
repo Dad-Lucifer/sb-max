@@ -5,6 +5,7 @@ import { FaUserShield, FaCoins } from 'react-icons/fa';
 import logo from '../../assets/sb.jpg';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
+import { useSidebarCollapsed } from '../../utils/sidebarState';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -22,7 +23,17 @@ const navItems = [
   { path: '/owner/pricing', icon: FaCoins, label: 'Pricing Config' },
 ];
 
-const Sidebar = ({ isCollapsed = false, toggleCollapsed, isMobile = false, isMobileOpen = false, onCloseMobile }: SidebarProps) => {
+const Sidebar = ({
+  isCollapsed: controlledCollapsed,
+  toggleCollapsed: controlledToggle,
+  isMobile = false,
+  isMobileOpen = false,
+  onCloseMobile
+}: SidebarProps) => {
+  const { isCollapsed: hookCollapsed, toggleCollapsed: hookToggle } = useSidebarCollapsed();
+  const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : hookCollapsed;
+  const toggleCollapsed = controlledToggle || hookToggle;
+
   const { user } = useAuth();
   const location = useLocation();
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
@@ -113,6 +124,7 @@ const Sidebar = ({ isCollapsed = false, toggleCollapsed, isMobile = false, isMob
             className="toggle-btn"
             onClick={toggleCollapsed}
             aria-label="Toggle Sidebar"
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? <MdChevronRight size={20} /> : <MdChevronLeft size={20} />}
           </button>

@@ -440,6 +440,31 @@
 .dark-input option {
     background: #1e1e2e;
     color: #fff;
+    padding: 6px;
+}
+
+.dark-input optgroup {
+    background: #181825;
+    color: #93c5fd;
+    font-weight: 600;
+}
+
+.custom-snack-entry {
+    grid-column: 1 / -1;
+}
+
+.profit-preview {
+    font-size: 0.85rem;
+    color: #34d399;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.so-modal-profit {
+    font-size: 0.875rem;
+    color: #34d399;
+    font-weight: 600;
+    margin: 0;
 }
 
 
