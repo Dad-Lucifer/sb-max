@@ -252,16 +252,24 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
     // Each remaining person simply pays their share of the debt
     const perPersonShare = totalPendingToPay / shareDivisor;
 
+    const maxCustomAmount = Math.max(0, Math.round(Math.min(totalPendingToPay, totalToPay)));
+
     // Amount this payment will cover
     let payNowAmount = 0;
 
     if (paymentMode === 'equal') {
         payNowAmount = payingNow * perPersonShare;
     } else {
-        payNowAmount = Math.min(Number(customPayAmount) || 0, totalPendingToPay);
+        payNowAmount = Math.min(Number(customPayAmount) || 0, maxCustomAmount);
     }
 
     const newRemainingAmount = Math.max(0, totalPendingToPay - payNowAmount);
+
+    useEffect(() => {
+        if (customPayAmount !== '' && Number(customPayAmount) > maxCustomAmount) {
+            setCustomPayAmount(maxCustomAmount > 0 ? maxCustomAmount : '');
+        }
+    }, [maxCustomAmount]);
 
 
 
@@ -734,12 +742,22 @@ const UpdateSessionModal = ({ session, onClose }: Props) => {
                                         <span className="invoice-label">Enter Amount</span>
                                         <input
                                             type="text"
+                                            inputMode="numeric"
                                             className="invoice-field"
                                             placeholder="0"
                                             value={customPayAmount}
                                             onChange={e => {
                                                 const val = e.target.value.replace(/\D/g, "");
-                                                setCustomPayAmount(val ? Number(val) : '');
+                                                if (!val) {
+                                                    setCustomPayAmount('');
+                                                    return;
+                                                }
+                                                const num = Number(val);
+                                                if (num > maxCustomAmount) {
+                                                    setCustomPayAmount(maxCustomAmount);
+                                                } else {
+                                                    setCustomPayAmount(num);
+                                                }
                                             }}
                                         />
                                     </div>
